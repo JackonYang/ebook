@@ -1,5 +1,13 @@
 *.py[cod]
 
+#vim
+*.swp
+
+.ropeproject/*
+
+# SVN
+.svn
+
 # C extensions
 *.so
 
