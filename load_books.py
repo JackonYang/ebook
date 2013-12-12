@@ -52,7 +52,7 @@ class BookIdx:
 
     def save(self):
         with open(self.json_file, 'w') as f:
-            f.write(json.dumps(self.idx, indent=4))
+            f.write(json.dumps(self.idx, indent=4, sort_keys=True))
 
 
 def mv_ebook(orig_file, md5_file):
