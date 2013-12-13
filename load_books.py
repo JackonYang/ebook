@@ -1,3 +1,5 @@
+import wx
+import sys
 import os
 import json
 import shutil
@@ -68,13 +70,29 @@ def mv_ebook(orig_file, md5_file):
         os.remove(orig_file_full)
 
 
+def load_books():
+    for bookfile in os.listdir(cache_path):
+        md5 = md5_for_file(os.path.join(cache_path, bookfile))
+        orig_name, ext = os.path.splitext(bookfile)
+        md5_file = '%s%s' % (md5, ext)
+        booklist.add(md5_file, orig_name)
+        mv_ebook(bookfile, md5_file)
+
+
+
+class BookListFrame(wx.Frame):
+    def __init__(self, bookinfo):
+        wx.Frame.__init__(self, None, -1, 'wx list ctrl mode')
+        self.list = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
+        self.list.InsertColumn(1001, 'books', format=wx.LIST_FORMAT_LEFT, width=-1) 
+
+        for v in bookinfo.idx.values():
+            for book in v:
+                print self.list.InsertStringItem(sys.maxint, book)
+
 booklist = BookIdx(repo_path)
 
-for bookfile in os.listdir(cache_path):
-    md5 = md5_for_file(os.path.join(cache_path, bookfile))
-    orig_name, ext = os.path.splitext(bookfile)
-    md5_file = '%s%s' % (md5, ext)
-    booklist.add(md5_file, orig_name)
-    mv_ebook(bookfile, md5_file)
-
-booklist.save()
+app = wx.PySimpleApp()
+frm = BookListFrame(booklist)
+frm.Show()
+app.MainLoop()
