@@ -6,7 +6,7 @@ import os
 
 
 def rm_repo_path():
-    for path in ['test_repo_exists', 'test_repo_not_exists']:
+    for path in ['test_repo_exists', 'test_repo_not_exists', 'temp_data']:
         if os.path.exists(path):
             shutil.rmtree(path, ignore_errors=True)
 
@@ -14,6 +14,7 @@ class testBookList(unittest.TestCase):
     def setUp(self):
         rm_repo_path()
         shutil.copytree('data_unittest', 'test_repo_exists')
+        shutil.copytree('data_unittest', 'temp_data')
         self.books = model.BookFile('test_repo_exists', 'test_file_not_empty.json')
         
     def tearDown(self):
@@ -77,19 +78,75 @@ class testBookList(unittest.TestCase):
 
         self.assertItemsEqual(self.books.get_origname('error_idx'), [])
 
+    def testAddIdx(self):
+
+        idx_name, orig_name = [u'12223ae7f9bf07744445e93ac5595156.pdf', u'test_file_not_exists']
+        self.books.add_idx(idx_name, orig_name)
+        self.assertItemsEqual(self.books.get_origname(idx_name), [orig_name])
+
+        self.books.add_idx(idx_name, 'non-repeat-name')
+        self.assertItemsEqual(self.books.get_origname(idx_name), [orig_name, 'non-repeat-name'])
+
+        idx_name, orig_name = [u'b1946ac92492d2347c6235b4d2611184.pdf', [u'test_like_pdf1', u'test_like_pdf2']]
+        self.books.add_idx(idx_name, u'test_like_pdf2')
+        self.assertItemsEqual(self.books.get_origname(idx_name), orig_name)
+        self.books.add_idx(idx_name, 'non-repeat-name')
+        orig_name.append('non-repeat-name')
+        self.assertItemsEqual(self.books.get_origname(idx_name), orig_name)
+
+    def testAddFile(self):
+
+        src_path = 'temp_data'
+        dst_path = self.books.repo_path
+
+        def dst_file_exists(filename):
+            return os.path.isfile(os.path.join(dst_path, filename))
+        def src_file_exists(filename):
+            return os.path.isfile(os.path.join(src_path, filename))
+
+        # new file not exists, and not del_orig
+        src, dst = [u'b1946ac92492d2347c6235b4d2611184.pdf', 'new_file']
+        self.assertFalse(dst_file_exists(dst))
+        self.books.add_file(os.path.join(src_path, src), dst, del_orig=False)
+        self.assertTrue(src_file_exists(src))
+        self.assertTrue(dst_file_exists(dst))
+
+        # new file exists, and not del_orig
+        src = u'b1946ac92492d2347c6235b4d2611184.pdf'
+        dst = src
+        self.assertTrue(dst_file_exists(dst))
+        self.books.add_file(os.path.join(src_path, src), dst, del_orig=False)
+        self.assertTrue(dst_file_exists(dst))
+        self.assertTrue(src_file_exists(src))
+
+        # new file not exists, and del_orig
+        src, dst = [u'b1946ac92492d2347c6235b4d2611184.pdf', 'file_22222']
+        self.assertFalse(dst_file_exists(dst))
+        self.books.add_file(os.path.join(src_path, src), dst, del_orig=True)
+        self.assertFalse(src_file_exists(src))
+        self.assertTrue(dst_file_exists(dst))
+
+        # new file exists, and del_orig
+        src = '0f723ae7f9bf07744445e93ac5595156.pdf'
+        dst = src
+        self.assertTrue(src_file_exists(dst))
+        self.books.add_file(os.path.join(src_path, src), dst, del_orig=True)
+        self.assertFalse(src_file_exists(src))
+        self.assertTrue(dst_file_exists(dst))
 
 
 testCases = {testBookList('testInit'),
         testBookList('testGetFilePath'),
         testBookList('testGetBookList'),
         testBookList('testGetOrigName'),
+        testBookList('testAddIdx'),
+        testBookList('testAddFile'),
         }
 
 
 if __name__ == '__main__':
     suite=unittest.TestSuite()
     runner=unittest.TextTestRunner()
-    runner.run(suite)
     for testcase in testCases:
         suite.addTest(testcase)
     runner=unittest.TextTestRunner()

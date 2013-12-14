@@ -2,6 +2,11 @@
 import json
 import os
 import shutil
+from util.wise_log import operate_log, debug_log
+from util.kkfile import md5_for_file
+
+log = debug_log()
+op_log = operate_log()
 
 class BookFile:
     def __init__(self, repo_path, filename='origname.json'):
@@ -35,3 +40,31 @@ class BookFile:
         return [] if idx_name does not exists.
         """
         return list(set(self.files.get(idx_name, [])))
+
+    def add_idx(self, idx_name, orig_name):
+        if idx_name in self.files:
+            self.files[idx_name].append(orig_name)
+            op_log.info('add orig_name %s to %s' % (orig_name, idx_name))
+        else:
+            self.files[idx_name] = [orig_name]
+            op_log.info('init orig_name %s for %s' % (orig_name, idx_name))
+
+    def add_file(self, src_file, dst_filename, del_orig=True):
+        dst_file = os.path.join(self.repo_path, dst_filename)
+        if not os.path.isfile(dst_file):  # dst file exists, no move
+            try:  # catch except when attempting to remove a file that is in use
+                shutil.copy(src_file, dst_file)
+            except:
+                op_log.error('failed to add %s to BookList' % src_file)
+                return False
+            else:
+                op_log.info('add %s to BookList' % src_file)
+        if del_orig:
+            try:
+                os.remove(src_file)
+            except:
+                log.error('failed to rm %s' % src_file)
+            else:
+                log.info('rm %s' % src_file)
+        
+        return True
