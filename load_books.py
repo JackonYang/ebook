@@ -3,7 +3,7 @@ import sys
 import os
 import json
 import shutil
-from util import md5_for_file
+from util.kkfile import md5_for_file, open_file
 
 base_path = os.path.realpath('..')
 
@@ -82,13 +82,20 @@ def load_books():
 
 class BookListFrame(wx.Frame):
     def __init__(self, bookinfo):
-        wx.Frame.__init__(self, None, -1, 'wx list ctrl mode')
+        wx.Frame.__init__(self, None, -1, 'lean book')
         self.list = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
-        self.list.InsertColumn(1001, 'books', format=wx.LIST_FORMAT_LEFT, width=-1) 
+        self.list.InsertColumn(1001, 'book list', format=wx.LIST_FORMAT_LEFT, width=500) 
 
-        for v in bookinfo.idx.values():
-            for book in v:
-                print self.list.InsertStringItem(sys.maxint, book)
+        self.idx2name = {}
+        for filename, showname in bookinfo.idx.items():
+            for book in showname:
+                self.idx2name[self.list.InsertStringItem(sys.maxint, book)] = filename
+                
+                
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnOpenFile, self.list)  # dlick to open a file
+
+    def OnOpenFile(self, event):
+        open_file(os.path.join(repo_path, self.idx2name[event.GetIndex()]))
 
 booklist = BookIdx(repo_path)
 
