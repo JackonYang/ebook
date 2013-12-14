@@ -22,7 +22,7 @@ class testBookList(unittest.TestCase):
     def testInit(self):
         # full filename, full data, repo exists
         full_dict = {
-                u'b1946ac92492d2347c6235b4d2611184.pdf': [u'test_like_pdf1', u'test_like_pdf2'],
+                u'b1946ac92492d2347c6235b4d2611184.pdf': [u'test_like_pdf1', u'test_like_pdf2', u'test_like_pdf1'],
                 u'12223ae7f9bf07744445e93ac5595156.pdf': [u'test_file_not_exists'], 
                 u'0f723ae7f9bf07744445e93ac5595156.pdf': [u'test_like_pdf0000']
                 }
@@ -64,6 +64,10 @@ class testBookList(unittest.TestCase):
         self.assertItemsEqual(self.books.get_booklist(), booklist)
         repo = model.BookFile('test_repo_not_exists', 'test_file_not_exists.json')
         self.assertItemsEqual(repo.get_booklist(), [])
+
+    def testGetOrigName(self):
+        pass
+
 
 
 testCases = {testBookList('testInit'),
