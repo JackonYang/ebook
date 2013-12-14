@@ -1,8 +1,11 @@
 import unittest
 import model
+import json
 
 import shutil
 import os
+
+from util.kkfile import md5_for_file
 
 
 def rm_repo_path():
@@ -134,6 +137,28 @@ class testBookList(unittest.TestCase):
         self.assertFalse(src_file_exists(src))
         self.assertTrue(dst_file_exists(dst))
 
+    def testSave(self):
+        def parse_json(repo):
+            with open(repo.datafile, 'r') as f:
+                content = f.read()
+            return json.loads(content)
+
+        repo = model.BookFile('test_repo_exists', 'testSave001')
+        repo.save()
+        self.assertItemsEqual(parse_json(repo), {})
+
+        repo.add_idx('origname', 'idxname')
+        repo.save()
+        self.assertItemsEqual(parse_json(repo), repo.files)
+
+        repo.add_idx('origname2', 'idxname2')
+        repo.save()
+        self.assertItemsEqual(parse_json(repo), repo.files)
+
+        repo.add_idx('origname3', 'idxname2')
+        repo.save()
+        self.assertItemsEqual(parse_json(repo), repo.files)
+
 
 testCases = {testBookList('testInit'),
         testBookList('testGetFilePath'),
@@ -141,6 +166,7 @@ testCases = {testBookList('testInit'),
         testBookList('testGetOrigName'),
         testBookList('testAddIdx'),
         testBookList('testAddFile'),
+        testBookList('testSave'),
         }
 
 

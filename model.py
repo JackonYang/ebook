@@ -44,10 +44,10 @@ class BookFile:
     def add_idx(self, idx_name, orig_name):
         if idx_name in self.files:
             self.files[idx_name].append(orig_name)
-            op_log.info('add orig_name %s to %s' % (orig_name, idx_name))
+            op_log.info('add orig_name %s as %s' % (orig_name, idx_name))
         else:
             self.files[idx_name] = [orig_name]
-            op_log.info('init orig_name %s for %s' % (orig_name, idx_name))
+            op_log.info('init orig_name %s as %s' % (orig_name, idx_name))
 
     def add_file(self, src_file, dst_filename, del_orig=True):
         dst_file = os.path.join(self.repo_path, dst_filename)
@@ -58,7 +58,9 @@ class BookFile:
                 op_log.error('failed to add %s to BookList' % src_file)
                 return False
             else:
-                op_log.info('add %s to BookList' % src_file)
+                op_log.info('add %s to BookList as %s' % (src_file, dst_filename))
+        else:
+            op_log.info('file %s exists in BookList, skip copying %s' % (dst_filename, src_file))
         if del_orig:
             try:
                 os.remove(src_file)
@@ -68,3 +70,9 @@ class BookFile:
                 log.info('rm %s' % src_file)
         
         return True
+
+    def save(self):
+        with open(self.datafile, 'w') as f:
+            f.write(json.dumps(self.files, indent=4, sort_keys=True))
+        op_log.info('save datafile')
+
