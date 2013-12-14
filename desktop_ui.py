@@ -13,18 +13,17 @@ class BookListFrame(wx.Frame):
         self.list.InsertColumn(1001, 'book list', format=wx.LIST_FORMAT_LEFT, width=500) 
 
         self.idx2name = {}
-        for filename, showname in bookinfo.idx.items():
-            for book in showname:
-                self.idx2name[self.list.InsertStringItem(sys.maxint, book)] = filename
-                
-                
+        for book in bookinfo.get_booklist():
+            for bookname in bookinfo.get_orig_name(book):
+                self.idx2name[self.list.InsertStringItem(sys.maxint, bookname)] = book
+
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnOpenFile, self.list)  # dlick to open a file
 
     def OnOpenFile(self, event):
         open_file(self.bookinfo.get_book_path(self.idx2name[event.GetIndex()]))
 
 if __name__ == '__main__':
-    booklist = BookRepo('a')
+    booklist = BookRepo('../book_repo')
 
     app = wx.PySimpleApp()
     frm = BookListFrame(booklist)

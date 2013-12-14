@@ -55,6 +55,15 @@ class BookRepo:
     def get_book_path(self, idx_name):
         return os.path.join(self.repo_path, idx_name)
 
+    def get_booklist(self, orderby=None):
+        return list(self.idx.keys())
+
+    def get_orig_name(self, idx_name):
+        try:
+            return set(self.idx[idx_name])
+        except TypeError:
+            # clean origname and return
+            pass
 
     def merge(self, new_repo_path):
         new_repo = BookRepo(new_repo_path)
@@ -68,7 +77,6 @@ class BookRepo:
                 self.idx[bookidx] = bookname
                 shutil.copy(new_repo.get_book_path(bookidx), self.repo_path)
         log.info('%s files merged' % (len(self.idx) - old_idx))
-
 
     def add(self, bookfile, tar_ext=''):
         if os.path.isfile(bookfile):
