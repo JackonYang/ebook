@@ -41,7 +41,7 @@ class BookRepo:
         else:
             # backup index file before change
             backup_file = os.path.join(self.backup_path, '%s.bak' % md5_for_file(self.idx_file))
-            shutil.move(self.idx_file, backup_file)
+            shutil.copy(self.idx_file, backup_file)
         return json.loads(content)
 
     def __save_idx(self):
@@ -49,8 +49,6 @@ class BookRepo:
             import json
             with open(self.idx_file, 'w') as f:
                 f.write(json.dumps(self.idx, indent=4, sort_keys=True))
-        else:
-            log.warn('empty idx! will not save to %s' % self.idx_file)
 
     def get_book_path(self, idx_name):
         return os.path.join(self.repo_path, idx_name)
@@ -60,7 +58,7 @@ class BookRepo:
 
     def get_orig_name(self, idx_name):
         try:
-            return set(self.idx[idx_name])
+            return self.idx[idx_name]['origname']
         except TypeError:
             # clean origname and return
             pass
