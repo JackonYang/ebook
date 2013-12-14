@@ -66,13 +66,23 @@ class testBookList(unittest.TestCase):
         self.assertItemsEqual(repo.get_booklist(), [])
 
     def testGetOrigName(self):
-        pass
+        test_data = {
+                u'b1946ac92492d2347c6235b4d2611184.pdf': [u'test_like_pdf1', u'test_like_pdf2'],
+                u'12223ae7f9bf07744445e93ac5595156.pdf': [u'test_file_not_exists'], 
+                u'0f723ae7f9bf07744445e93ac5595156.pdf': [u'test_like_pdf0000']
+                }
+
+        for idx, origname in test_data.items():
+            self.assertItemsEqual(self.books.get_origname(idx), origname)
+
+        self.assertItemsEqual(self.books.get_origname('error_idx'), [])
 
 
 
 testCases = {testBookList('testInit'),
         testBookList('testGetFilePath'),
         testBookList('testGetBookList'),
+        testBookList('testGetOrigName'),
         }
 
 

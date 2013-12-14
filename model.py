@@ -28,3 +28,10 @@ class BookFile:
     
     def get_booklist(self, orderby=None):
         return list(self.files.keys())
+
+    def get_origname(self, idx_name):
+        """
+        get list of non-repeat origname.
+        return [] if idx_name does not exists.
+        """
+        return list(set(self.files.get(idx_name, [])))
