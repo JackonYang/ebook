@@ -3,7 +3,10 @@
 #vim
 *.swp
 
-.ropeproject/*
+*.ropeproject/*
+
+# wise log
+*log/debug/*
 
 # SVN
 .svn
