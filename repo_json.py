@@ -49,6 +49,21 @@ class BookRepo:
     def get_book_path(self, idx_name):
         return os.path.join(self.repo_path, idx_name)
 
+
+    def merge(self, new_repo_path):
+        new_repo = BookRepo(new_repo_path)
+        old_idx = len(self.idx)
+        for bookidx, bookname in new_repo.idx.items():
+            if bookidx in self.idx:
+                self.idx[bookidx].append(bookname)
+                print 'warning | skip cp %s ' % bookidx
+            else:
+                print 'cp %s' % bookname
+                self.idx[bookidx] = bookname
+                shutil.copy(new_repo.get_book_path(bookidx), self.repo_path)
+        print '%s files merged' % (len(self.idx) - old_idx)
+
+
     def add(self, bookfile, tar_ext=''):
         if os.path.isfile(bookfile):
             orig_name, ext = os.path.splitext(os.path.basename(bookfile))
@@ -87,5 +102,8 @@ class BookRepo:
 
 
 if __name__ == '__main__':
-    booklist = BookRepo('a')
-    booklist.add('/media/document/book/calibre', 'pdf')
+    repo1 = '/media/document/book_repo'
+    repo2 = 'a'
+    booklist = BookRepo(repo1)
+    # booklist.add('/media/document/book/calibre', 'pdf')
+    booklist.merge(repo2)
