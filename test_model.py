@@ -14,6 +14,7 @@ class testBookList(unittest.TestCase):
     def setUp(self):
         rm_repo_path()
         shutil.copytree('data_unittest', 'test_repo_exists')
+        self.books = model.BookFile('test_repo_exists', 'test_file_not_empty.json')
         
     def tearDown(self):
         rm_repo_path()
@@ -48,9 +49,19 @@ class testBookList(unittest.TestCase):
         # raise exception json file format error
         self.assertRaises(ValueError, model.BookFile, 'test_repo_exists', 'test_file_empty.json')
 
+    def testGetFilePath(self):
+        existed_file = ['b1946ac92492d2347c6235b4d2611184.pdf', '0f723ae7f9bf07744445e93ac5595156.pdf']
+        for bookfile in existed_file:
+            self.assertTrue(os.path.isfile(self.books.get_file_path(bookfile)))
+        not_existe_file = ['12223ae7f9bf07744445e93ac5595156.pdf']
+        for bookfile in not_existe_file:
+            self.assertFalse(os.path.isfile(self.books.get_file_path(bookfile)))
 
-testCases = {testBookList('testInit')
+
+testCases = {testBookList('testInit'),
+        testBookList('testGetFilePath'),
         }
+
 
 if __name__ == '__main__':
     suite=unittest.TestSuite()
