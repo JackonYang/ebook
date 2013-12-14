@@ -46,6 +46,9 @@ class BookRepo:
         with open(self.idx_file, 'w') as f:
             f.write(json.dumps(self.idx, indent=4, sort_keys=True))
 
+    def get_book_path(self, idx_name):
+        return os.path.join(self.repo_path, idx_name)
+
     def add(self, bookfile, tar_ext=''):
         if os.path.isfile(bookfile):
             orig_name, ext = os.path.splitext(os.path.basename(bookfile))
