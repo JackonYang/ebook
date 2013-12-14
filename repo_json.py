@@ -42,9 +42,12 @@ class BookRepo:
         return json.loads(content)
 
     def __save_idx(self):
-        import json
-        with open(self.idx_file, 'w') as f:
-            f.write(json.dumps(self.idx, indent=4, sort_keys=True))
+        if self.idx:
+            import json
+            with open(self.idx_file, 'w') as f:
+                f.write(json.dumps(self.idx, indent=4, sort_keys=True))
+        else:
+            print 'error occurs, does not save idx'
 
     def get_book_path(self, idx_name):
         return os.path.join(self.repo_path, idx_name)
@@ -55,7 +58,7 @@ class BookRepo:
         old_idx = len(self.idx)
         for bookidx, bookname in new_repo.idx.items():
             if bookidx in self.idx:
-                self.idx[bookidx].append(bookname)
+                self.idx[bookidx].extend(bookname)
                 print 'warning | skip cp %s ' % bookidx
             else:
                 print 'cp %s' % bookname
