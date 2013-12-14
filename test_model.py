@@ -52,14 +52,23 @@ class testBookList(unittest.TestCase):
     def testGetFilePath(self):
         existed_file = ['b1946ac92492d2347c6235b4d2611184.pdf', '0f723ae7f9bf07744445e93ac5595156.pdf']
         for bookfile in existed_file:
-            self.assertTrue(os.path.isfile(self.books.get_file_path(bookfile)))
+            self.assertTrue(os.path.isfile(self.books.get_filepath(bookfile)))
         not_existe_file = ['12223ae7f9bf07744445e93ac5595156.pdf']
         for bookfile in not_existe_file:
-            self.assertFalse(os.path.isfile(self.books.get_file_path(bookfile)))
+            self.assertFalse(os.path.isfile(self.books.get_filepath(bookfile)))
+
+    def testGetBookList(self):
+        booklist = ['b1946ac92492d2347c6235b4d2611184.pdf',
+                '0f723ae7f9bf07744445e93ac5595156.pdf',
+                '12223ae7f9bf07744445e93ac5595156.pdf']
+        self.assertItemsEqual(self.books.get_booklist(), booklist)
+        repo = model.BookFile('test_repo_not_exists', 'test_file_not_exists.json')
+        self.assertItemsEqual(repo.get_booklist(), [])
 
 
 testCases = {testBookList('testInit'),
         testBookList('testGetFilePath'),
+        testBookList('testGetBookList'),
         }
 
 

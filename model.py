@@ -23,5 +23,8 @@ class BookFile:
             with open(self.datafile, 'r') as f:
                 self.files = json.loads(f.read())
 
-    def get_file_path(self, idx_name):
+    def get_filepath(self, idx_name):
         return os.path.join(self.repo_path, idx_name)
+    
+    def get_booklist(self, orderby=None):
+        return list(self.files.keys())
