@@ -2,6 +2,9 @@ import os
 import json
 import shutil
 from util.kkfile import md5_for_file
+from util.wise_log import operate_log
+
+log = operate_log()
 
 
 class BookRepo:
@@ -47,7 +50,7 @@ class BookRepo:
             with open(self.idx_file, 'w') as f:
                 f.write(json.dumps(self.idx, indent=4, sort_keys=True))
         else:
-            print 'error occurs, does not save idx'
+            log.warn('empty idx! will not save to %s' % self.idx_file)
 
     def get_book_path(self, idx_name):
         return os.path.join(self.repo_path, idx_name)
@@ -59,12 +62,12 @@ class BookRepo:
         for bookidx, bookname in new_repo.idx.items():
             if bookidx in self.idx:
                 self.idx[bookidx].extend(bookname)
-                print 'warning | skip cp %s ' % bookidx
+                log.warn('skip cp %s ' % bookidx)
             else:
-                print 'cp %s' % bookname
+                log.info('cp %s' % bookname)
                 self.idx[bookidx] = bookname
                 shutil.copy(new_repo.get_book_path(bookidx), self.repo_path)
-        print '%s files merged' % (len(self.idx) - old_idx)
+        log.info('%s files merged' % (len(self.idx) - old_idx))
 
 
     def add(self, bookfile, tar_ext=''):
@@ -76,7 +79,7 @@ class BookRepo:
                 self.__add_idx(md5_file, orig_name)
                 self.__add_file(bookfile, md5_file)
             else:
-                print 'warning | ignore %s' % bookfile
+                log.warn('ignore %s' % bookfile)
         elif os.path.isdir(bookfile):
             for root, dirs, files in os.walk(bookfile):
                 for name in dirs:
@@ -84,7 +87,7 @@ class BookRepo:
                 for name in files:
                     self.add(os.path.join(root, name), tar_ext)
         else:
-            print 'file or path needed'
+            log.error('%s is not a file or path' % bookfile)
 
     def __add_idx(self, md5_file, orig_name):
         if md5_file in self.idx:
@@ -97,10 +100,9 @@ class BookRepo:
         md5_file_full = os.path.join(self.repo_path, md5_file)
         if not os.path.isfile(md5_file_full):
             shutil.move(orig_file_full, md5_file_full)
-            print 'info | mv %s' % orig_file_full
+            log.info('mv %s' % orig_file_full)
         else:
-            # log it, warning
-            print 'warning | rm %s' % orig_file_full
+            log.warn('rm %s' % orig_file_full)
             os.remove(orig_file_full)
 
 
