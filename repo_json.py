@@ -1,4 +1,3 @@
-import sys
 import os
 import json
 import shutil
@@ -47,15 +46,24 @@ class BookRepo:
         with open(self.idx_file, 'w') as f:
             f.write(json.dumps(self.idx, indent=4, sort_keys=True))
 
-    def add(self, bookfile):
-        orig_name, ext = os.path.splitext(os.path.basename(bookfile))
-        try:
-            md5 = md5_for_file(bookfile)
-            md5_file = '%s%s' % (md5, ext)
-            self.__add_idx(md5_file, orig_name)
-            self.__add_file(bookfile, md5_file)
-        except IOError:
-            print '%s does not exist' % bookfile
+    def add(self, bookfile, tar_ext=''):
+        if os.path.isfile(bookfile):
+            orig_name, ext = os.path.splitext(os.path.basename(bookfile))
+            if ext.endswith(tar_ext):
+                md5 = md5_for_file(bookfile)
+                md5_file = '%s%s' % (md5, ext)
+                self.__add_idx(md5_file, orig_name)
+                self.__add_file(bookfile, md5_file)
+            else:
+                print 'warning | ignore %s' % bookfile
+        elif os.path.isdir(bookfile):
+            for root, dirs, files in os.walk(bookfile):
+                for name in dirs:
+                    self.add(os.path.join(root, name), tar_ext)
+                for name in files:
+                    self.add(os.path.join(root, name), tar_ext)
+        else:
+            print 'file or path needed'
 
     def __add_idx(self, md5_file, orig_name):
         if md5_file in self.idx:
@@ -77,4 +85,4 @@ class BookRepo:
 
 if __name__ == '__main__':
     booklist = BookRepo('a')
-    booklist.add('/media/document/ebook/test.py')
+    booklist.add('/media/document/book/calibre', 'pdf')
