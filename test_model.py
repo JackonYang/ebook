@@ -1,3 +1,4 @@
+# -*- coding: utf-8-*-
 import unittest
 import model
 import json
@@ -5,23 +6,15 @@ import json
 import shutil
 import os
 
-from util.kkfile import md5_for_file
+import test_tools
 
-
-def rm_repo_path():
-    for path in ['test_repo_exists', 'test_repo_not_exists', 'temp_data']:
-        if os.path.exists(path):
-            shutil.rmtree(path, ignore_errors=True)
 
 class testBookList(unittest.TestCase):
     def setUp(self):
-        rm_repo_path()
-        shutil.copytree('data_unittest', 'test_repo_exists')
-        shutil.copytree('data_unittest', 'temp_data')
-        self.books = model.BookFile('test_repo_exists', 'test_file_not_empty.json')
+        self.books = test_tools.init_test_data(model.BookFile)
         
     def tearDown(self):
-        rm_repo_path()
+        test_tools.clear_test_data()
 
     def testInit(self):
         # full filename, full data, repo exists
@@ -160,7 +153,7 @@ class testBookList(unittest.TestCase):
         self.assertItemsEqual(parse_json(repo), repo.files)
 
 
-testCases = {testBookList('testInit'),
+testcases = {testBookList('testInit'),
         testBookList('testGetFilePath'),
         testBookList('testGetBookList'),
         testBookList('testGetOrigName'),
@@ -169,11 +162,4 @@ testCases = {testBookList('testInit'),
         testBookList('testSave'),
         }
 
-
-if __name__ == '__main__':
-    suite=unittest.TestSuite()
-    runner=unittest.TextTestRunner()
-    for testcase in testCases:
-        suite.addTest(testcase)
-    runner=unittest.TextTestRunner()
-    runner.run(suite)
+test_tools.run_tests(testcases)
