@@ -2,7 +2,7 @@ import wx
 import sys
 import os
 from util.kkfile import open_file
-from repo_json import BookRepo
+from model import BookFile
 
 
 class BookListFrame(wx.Frame):
@@ -14,18 +14,16 @@ class BookListFrame(wx.Frame):
 
         self.idx2name = {}
         for book in bookinfo.get_booklist():
-            for bookname in bookinfo.get_orig_name(book):
+            for bookname in bookinfo.get_origname(book):
                 self.idx2name[self.list.InsertStringItem(sys.maxint, bookname)] = book
 
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnOpenFile, self.list)  # dlick to open a file
 
     def OnOpenFile(self, event):
-        open_file(self.bookinfo.get_book_path(self.idx2name[event.GetIndex()]))
+        open_file(self.bookinfo.get_filepath(self.idx2name[event.GetIndex()]))
 
 if __name__ == '__main__':
-    booklist = BookRepo('../book_repo')
-
     app = wx.PySimpleApp()
-    frm = BookListFrame(booklist)
+    frm = BookListFrame(BookFile('a'))
     frm.Show()
     app.MainLoop()
