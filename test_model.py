@@ -11,7 +11,8 @@ import test_tools
 
 class testBookList(unittest.TestCase):
     def setUp(self):
-        self.books = test_tools.init_test_data(model.BookFile)
+        path, filename = test_tools.init_test_data()
+        self.books = model.BookFile(path, filename)
         
     def tearDown(self):
         test_tools.clear_test_data()
@@ -93,42 +94,43 @@ class testBookList(unittest.TestCase):
     def testAddFile(self):
 
         src_path = 'temp_data'
-        dst_path = self.books.repo_path
 
-        def dst_file_exists(filename):
-            return os.path.isfile(os.path.join(dst_path, filename))
-        def src_file_exists(filename):
-            return os.path.isfile(os.path.join(src_path, filename))
+        def all_exist():
+            self.assertTrue(self.__file_exists(src, src_path))
+            self.assertTrue(self.__file_exists(dst))
+
+        def only_dst():
+            self.assertFalse(self.__file_exists(src, src_path))
+            self.assertTrue(self.__file_exists(dst))
+        def only_src():
+            self.assertTrue(self.__file_exists(src, src_path))
+            self.assertFalse(self.__file_exists(dst))
 
         # new file not exists, and not del_orig
         src, dst = [u'b1946ac92492d2347c6235b4d2611184.pdf', 'new_file']
-        self.assertFalse(dst_file_exists(dst))
+        only_src()
         self.books.add_file(os.path.join(src_path, src), dst, del_orig=False)
-        self.assertTrue(src_file_exists(src))
-        self.assertTrue(dst_file_exists(dst))
+        all_exist()
 
         # new file exists, and not del_orig
         src = u'b1946ac92492d2347c6235b4d2611184.pdf'
         dst = src
-        self.assertTrue(dst_file_exists(dst))
+        all_exist()
         self.books.add_file(os.path.join(src_path, src), dst, del_orig=False)
-        self.assertTrue(dst_file_exists(dst))
-        self.assertTrue(src_file_exists(src))
+        all_exist()
 
         # new file not exists, and del_orig
         src, dst = [u'b1946ac92492d2347c6235b4d2611184.pdf', 'file_22222']
-        self.assertFalse(dst_file_exists(dst))
+        only_src()
         self.books.add_file(os.path.join(src_path, src), dst, del_orig=True)
-        self.assertFalse(src_file_exists(src))
-        self.assertTrue(dst_file_exists(dst))
+        only_dst()
 
         # new file exists, and del_orig
         src = '0f723ae7f9bf07744445e93ac5595156.pdf'
         dst = src
-        self.assertTrue(src_file_exists(dst))
+        all_exist()
         self.books.add_file(os.path.join(src_path, src), dst, del_orig=True)
-        self.assertFalse(src_file_exists(src))
-        self.assertTrue(dst_file_exists(dst))
+        only_dst()
 
     def testSave(self):
         def parse_json(repo):
@@ -152,6 +154,32 @@ class testBookList(unittest.TestCase):
         repo.save()
         self.assertItemsEqual(parse_json(repo), repo.files)
 
+    def testBackup(self):
+        self.assertTrue(self.__file_exists())  # pre check, datafile exists
+
+        # auto backup, keep orig file
+        self.books.backup()
+        self.assertTrue(self.__file_exists())
+
+        # manual backup, remove orig file
+        self.books.backup(auto=False)
+        self.assertFalse(self.__file_exists())
+
+        # return 1 if orig file not exist
+        self.assertEquals(self.books.backup(), 1)  # auto check
+        self.assertFalse(self.__file_exists())
+        self.assertEquals(self.books.backup(auto=False), 1)  # manual check
+        self.assertFalse(self.__file_exists())
+
+    def __file_exists(self, filename=None, path=None):
+        if path is None:
+            path = self.books.repo_path
+
+        if filename is None:
+            src_file = self.books.datafile
+        else:
+            src_file = os.path.join(path, filename)
+        return os.path.isfile(src_file)
 
 testcases = {testBookList('testInit'),
         testBookList('testGetFilePath'),
@@ -160,6 +188,7 @@ testcases = {testBookList('testInit'),
         testBookList('testAddIdx'),
         testBookList('testAddFile'),
         testBookList('testSave'),
+        testBookList('testBackup'),
         }
 
 test_tools.run_tests(testcases)

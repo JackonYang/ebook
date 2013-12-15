@@ -8,12 +8,12 @@ def clear_test_data():
         if os.path.exists(path):
             shutil.rmtree(path, ignore_errors=True)
 
-def init_test_data(obj):
+def init_test_data():
     clear_test_data()
     shutil.copytree('data_unittest', 'test_repo_exists')
     shutil.copytree('data_unittest', 'temp_data')
-    return obj('test_repo_exists', 'test_file_not_empty.json')
-    
+    return ['test_repo_exists', 'test_file_not_empty.json']
+
 
 def run_tests(testCases):
     suite=unittest.TestSuite()

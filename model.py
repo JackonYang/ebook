@@ -4,6 +4,7 @@ import os
 import shutil
 from util.wise_log import operate_log, debug_log
 from util.util import md5_for_file
+from util.util import timestamp
 
 log = debug_log()
 op_log = operate_log()
@@ -75,4 +76,16 @@ class BookFile:
         with open(self.datafile, 'w') as f:
             f.write(json.dumps(self.files, indent=4, sort_keys=True))
         op_log.info('save datafile')
+
+    def backup(self, auto=True):
+        if not os.path.isfile(self.datafile):
+            return 1
+        prefix = 'bak'
+        if auto:
+            prefix = 'autobak'
+        backup_file = os.path.join(self.repo_path, '%s_index_%s.json.bak' % (prefix, timestamp(for_name=True)))
+        if auto:
+            shutil.copy(self.datafile, backup_file)
+        else:
+            shutil.move(self.datafile, backup_file)
 
