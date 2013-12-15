@@ -3,7 +3,7 @@ import json
 import os
 import shutil
 from util.wise_log import operate_log, debug_log
-from util.kkfile import md5_for_file
+from util.util import md5_for_file
 
 log = debug_log()
 op_log = operate_log()
