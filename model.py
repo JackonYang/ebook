@@ -44,15 +44,18 @@ class FlatFile:
         return list of non-repeat raw names
 
         """
-        return list(set(self.files.get(idx_name, [])))
+        if idx_name not in self.files:
+            return []
+
+        return set(list(self.files[idx_name].get('raw_name', [])))
 
     def add_idx(self, idx_name, raw_name):
-        if idx_name in self.files:
-            self.files[idx_name].append(raw_name)
-            op_log.info('add raw_name %s as %s' % (raw_name, idx_name))
+        if isinstance(raw_name, basestring):
+            raw_name = [raw_name]
+        if idx_name in self.files and 'raw_name' in self.files[idx_name]:
+            self.files[idx_name]['raw_name'].extend(raw_name)
         else:
-            self.files[idx_name] = [raw_name]
-            op_log.info('init raw_name %s as %s' % (raw_name, idx_name))
+            self.files[idx_name] = {'raw_name': raw_name}
 
     def add_file(self, src_file, dst_filename, del_orig=True):
         dst_file = os.path.join(self.repo_path, dst_filename)
