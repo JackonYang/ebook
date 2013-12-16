@@ -2,7 +2,7 @@
 import os
 from model import FlatFile
 from util.util import md5_for_file
-from util.util import open_file
+from util.util import open_file as open_file_
 from util.wise_log import operate_log, debug_log
 log = debug_log()
 op_log = operate_log()
@@ -23,7 +23,7 @@ def get_rawname(idx_file):
     return filelist.get_rawname(idx_file)
 
 def open_file(filename):
-    open_file(controls.get_filepath(filename))
+    open_file_(filelist.get_filepath(filename))
 
 def add(book_path, tar_ext='.pdf', depth=10, del_orig=False, is_root=True):
 
