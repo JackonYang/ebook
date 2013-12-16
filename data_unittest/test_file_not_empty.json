@@ -1,18 +1,18 @@
 {
     "b1946ac92492d2347c6235b4d2611184.pdf": {
-        "raw_name": [
+        "rawname": [
         "test_like_pdf1",
         "test_like_pdf2",
         "test_like_pdf1"
         ]
     },
     "0f723ae7f9bf07744445e93ac5595156.pdf": {
-        "raw_name": [
+        "rawname": [
         "test_like_pdf0000"
         ]
     },
     "12223ae7f9bf07744445e93ac5595156.pdf": {
-        "raw_name": [
+        "rawname": [
         "test_file_not_exists"
         ]
     }

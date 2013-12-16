@@ -47,15 +47,31 @@ class FlatFile:
         if idx_name not in self.files:
             return []
 
-        return set(list(self.files[idx_name].get('raw_name', [])))
+        return set(list(self.files[idx_name].get('rawname', [])))
 
-    def add_idx(self, idx_name, raw_name):
-        if isinstance(raw_name, basestring):
-            raw_name = [raw_name]
-        if idx_name in self.files and 'raw_name' in self.files[idx_name]:
-            self.files[idx_name]['raw_name'].extend(raw_name)
+    def get_dispname(self, idx_name):
+        """get display name of a file
+
+        if display name does not exist, return list of non-repeat raw names
+
+        """
+        if idx_name not in self.files:
+            return []
+        try:
+            return [self.files[idx_name]['dispname']]
+        except KeyError:
+            return self.get_rawname(idx_name)
+
+    def update_dispname(self, idx_name, dispname):
+        self.files[idx_name]['dispname'] = dispname
+
+    def add_idx(self, idx_name, rawname):
+        if isinstance(rawname, basestring):
+            rawname = [rawname]
+        if idx_name in self.files and 'rawname' in self.files[idx_name]:
+            self.files[idx_name]['rawname'].extend(rawname)
         else:
-            self.files[idx_name] = {'raw_name': raw_name}
+            self.files[idx_name] = {'rawname': rawname}
 
     def add_file(self, src_file, dst_filename, del_orig=True):
         dst_file = os.path.join(self.repo_path, dst_filename)
