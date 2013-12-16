@@ -22,6 +22,12 @@ def get_filelist(matches='*.*'):
 def get_rawname(idx_file):
     return filelist.get_rawname(idx_file)
 
+def get_dispname(idx_file):
+    return filelist.get_dispname(idx_file)
+
+def update_dispname(idx_name, disp_name):
+    filelist.update_dispname(idx_name, disp_name)
+
 def open_file(filename):
     open_file_(filelist.get_filepath(filename))
 

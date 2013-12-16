@@ -64,6 +64,7 @@ class FlatFile:
 
     def update_dispname(self, idx_name, dispname):
         self.files[idx_name]['dispname'] = dispname
+        self.save()
 
     def add_idx(self, idx_name, rawname):
         if isinstance(rawname, basestring):
