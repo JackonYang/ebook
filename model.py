@@ -9,46 +9,50 @@ from util.util import timestamp
 log = debug_log()
 op_log = operate_log()
 
-class BookFile:
-    def __init__(self, repo_path, filename='origname.json'):
+class FlatFile:
+    def __init__(self, repo_path, idx_filename='index.json'):
+        """Decouple file position and file relationship
+
+        save all files named by md5_code.ext in one dir,
+        and raw filename/display filename/status in idx_file.
+
         """
-        data model for file list and it orig names.
-        """
-        if not filename.endswith('.json'):
-            filename = '%s.json' % filename
+        if not idx_filename.endswith('.json'):
+            idx_filename = '%s.json' % idx_filename
         self.repo_path = repo_path
-        self.datafile = os.path.join(repo_path, filename)
+        self.idx_file = os.path.join(repo_path, idx_filename)
 
         # make path if not exists
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
-        if not os.path.isfile(self.datafile):
+        if not os.path.isfile(self.idx_file):
             self.files = {}
         else: 
-            with open(self.datafile, 'r') as f:
+            with open(self.idx_file, 'r') as f:
                 self.files = json.loads(f.read())
 
     def get_filepath(self, idx_name):
         return os.path.join(self.repo_path, idx_name)
     
-    def get_booklist(self, orderby=None):
+    def get_filelist(self, orderby=None):
         return list(self.files.keys())
 
-    def get_origname(self, idx_name):
-        """
-        get list of non-repeat origname.
-        return [] if idx_name does not exists.
+    def get_rawname(self, idx_name):
+        """get raw name of a file
+
+        return list of non-repeat raw names
+
         """
         return list(set(self.files.get(idx_name, [])))
 
-    def add_idx(self, idx_name, orig_name):
+    def add_idx(self, idx_name, raw_name):
         if idx_name in self.files:
-            self.files[idx_name].append(orig_name)
-            op_log.info('add orig_name %s as %s' % (orig_name, idx_name))
+            self.files[idx_name].append(raw_name)
+            op_log.info('add raw_name %s as %s' % (raw_name, idx_name))
         else:
-            self.files[idx_name] = [orig_name]
-            op_log.info('init orig_name %s as %s' % (orig_name, idx_name))
+            self.files[idx_name] = [raw_name]
+            op_log.info('init raw_name %s as %s' % (raw_name, idx_name))
 
     def add_file(self, src_file, dst_filename, del_orig=True):
         dst_file = os.path.join(self.repo_path, dst_filename)
@@ -73,19 +77,19 @@ class BookFile:
         return True
 
     def save(self):
-        with open(self.datafile, 'w') as f:
+        with open(self.idx_file, 'w') as f:
             f.write(json.dumps(self.files, indent=4, sort_keys=True))
-        op_log.info('save datafile')
+        op_log.info('save idx_file')
 
     def backup(self, auto=True):
-        if not os.path.isfile(self.datafile):
+        if not os.path.isfile(self.idx_file):
             return 1
         prefix = 'bak'
         if auto:
             prefix = 'autobak'
         backup_file = os.path.join(self.repo_path, '%s_index_%s.json.bak' % (prefix, timestamp(for_name=True)))
         if auto:
-            shutil.copy(self.datafile, backup_file)
+            shutil.copy(self.idx_file, backup_file)
         else:
-            shutil.move(self.datafile, backup_file)
+            shutil.move(self.idx_file, backup_file)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8-*-
 import os
-from model import BookFile
+from model import FlatFile
 from util.util import md5_for_file
 from util.wise_log import operate_log, debug_log
 log = debug_log()
@@ -11,7 +11,7 @@ filelist = None
 def build_repo(repo_path, filename='origname.json'):
     global filelist
     try:
-        filelist = BookFile(repo_path, filename)
+        filelist = FlatFile(repo_path, filename)
     except ValueError:
         raise ValueError('json loads %s error' % filename)
 
