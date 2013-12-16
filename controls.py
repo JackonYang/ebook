@@ -25,7 +25,10 @@ def get_rawname(idx_file):
 def open_file(filename):
     open_file(controls.get_filepath(filename))
 
-def add(book_path, tar_ext='.pdf', del_orig=False, is_root=True):
+def add(book_path, tar_ext='.pdf', depth=10, del_orig=False, is_root=True):
+
+    if depth < 0:
+        return
     if is_root:
         # backup first
         op_log.info('add %s to BookList' % book_path)
@@ -44,15 +47,12 @@ def add(book_path, tar_ext='.pdf', del_orig=False, is_root=True):
     elif os.path.isdir(book_path):
         for root, dirs, files in os.walk(book_path):
             for name in dirs:
-                add(os.path.join(root, name), tar_ext, del_orig=del_orig, is_root=False)
+                add(os.path.join(root, name), tar_ext, depth=depth-1, del_orig=del_orig, is_root=False)
                 # delete empty dirs and log
             for name in files:
-                add(os.path.join(root, name), tar_ext, del_orig=del_orig, is_root=False)
+                add(os.path.join(root, name), tar_ext, depth=depth-1, del_orig=del_orig, is_root=False)
     else:
         log.error('%s should be a file or path' % book_path)
 
     if is_root:
         filelist.save()
-
-build_repo('a')
-add('/media/document/lean-read/media')

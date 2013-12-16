@@ -20,8 +20,11 @@ class BookListFrame(wx.Frame):
     def OnOpenFile(self, event):
         controls.open_file(self.idx2name[event.GetIndex()])
 
-if __name__ == '__main__':
+def main(repo_path):
     app = wx.PySimpleApp()
-    frm = BookListFrame('a')
+    frm = BookListFrame(repo_path)
     frm.Show()
     app.MainLoop()
+
+if __name__ == '__main__':
+    main('a')
