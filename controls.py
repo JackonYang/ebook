@@ -8,14 +8,14 @@ op_log = operate_log()
 
 filelist = None
 
-def build_repo(repo_path, filename='origname.json'):
+def build_repo(repo_path, idx_file='index.json'):
     global filelist
     try:
-        filelist = FlatFile(repo_path, filename)
+        filelist = FlatFile(repo_path, idx_file)
     except ValueError:
-        raise ValueError('json loads %s error' % filename)
+        raise ValueError('json loads %s error' % idx_file)
 
-def add(book_path, tar_ext='', del_orig=False, is_root=True):
+def add(book_path, tar_ext='.pdf', del_orig=False, is_root=True):
     if is_root:
         # backup first
         op_log.info('add %s to BookList' % book_path)
@@ -43,3 +43,6 @@ def add(book_path, tar_ext='', del_orig=False, is_root=True):
 
     if is_root:
         filelist.save()
+
+build_repo('a')
+add('/media/document/lean-read/media')

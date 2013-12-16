@@ -1,7 +1,7 @@
 import unittest
 import test_tools
 
-import views 
+import controls
 
 
 class testViews(unittest.TestCase):
@@ -18,18 +18,14 @@ class testViews(unittest.TestCase):
                 u'12223ae7f9bf07744445e93ac5595156.pdf': [u'test_file_not_exists'], 
                 u'0f723ae7f9bf07744445e93ac5595156.pdf': [u'test_like_pdf0000']
                 }
-        views.build_repo('test_repo_exists', 'test_file_not_empty.json')
-        self.assertItemsEqual(views.filelist.files, full_dict)
+        controls.build_repo('test_repo_exists', 'test_file_not_empty.json')
+        self.assertItemsEqual(controls.filelist.files, full_dict)
 
         # repo path not exists
-        views.build_repo('test_repo_not_exists', 'test_file_not_exists.json')
-        self.assertItemsEqual(views.filelist.files, {})
+        controls.build_repo('test_repo_not_exists')
+        self.assertItemsEqual(controls.filelist.files, {})
 
-        # default filename
-        views.build_repo('test_repo_not_exists')
-        self.assertItemsEqual(views.filelist.files, {})
-
-        self.assertRaises(ValueError, views.build_repo, 'test_repo_exists', 'test_file_empty.json')
+        self.assertRaises(ValueError, controls.build_repo, 'test_repo_exists', 'test_file_empty.json')
 
 
 testcases = {
