@@ -2,6 +2,7 @@
 import os
 from model import FlatFile
 from util.util import md5_for_file
+from util.util import open_file
 from util.wise_log import operate_log, debug_log
 log = debug_log()
 op_log = operate_log()
@@ -14,6 +15,15 @@ def build_repo(repo_path, idx_file='index.json'):
         filelist = FlatFile(repo_path, idx_file)
     except ValueError:
         raise ValueError('json loads %s error' % idx_file)
+
+def get_filelist(matches='*.*'):
+    return filelist.get_filelist()
+
+def get_rawname(idx_file):
+    return filelist.get_rawname(idx_file)
+
+def open_file(filename):
+    open_file(controls.get_filepath(filename))
 
 def add(book_path, tar_ext='.pdf', del_orig=False, is_root=True):
     if is_root:

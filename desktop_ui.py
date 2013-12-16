@@ -1,29 +1,27 @@
 import wx
 import sys
 import os
-from util.util import open_file
-from model import FlatFile
+import controls
 
 class BookListFrame(wx.Frame):
-    def __init__(self, bookinfo):
-        self.bookinfo = bookinfo
-        wx.Frame.__init__(self, None, -1, 'lean book')
+    def __init__(self, repo_path):
+        controls.build_repo(repo_path)
+        wx.Frame.__init__(self, None, -1, 'Flat File')
         self.list = wx.ListCtrl(self, -1, style=wx.LC_REPORT)
-        self.list.InsertColumn(1001, 'book list', format=wx.LIST_FORMAT_LEFT, width=500) 
+        self.list.InsertColumn(1001, '', format=wx.LIST_FORMAT_LEFT, width=500) 
 
         self.idx2name = {}
-        for book in bookinfo.get_filelist():
-            for bookname in bookinfo.get_rawname(book):
+        for book in controls.get_filelist():
+            for bookname in controls.get_rawname(book):
                 self.idx2name[self.list.InsertStringItem(sys.maxint, bookname)] = book
 
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnOpenFile, self.list)  # dlick to open a file
 
     def OnOpenFile(self, event):
-        open_file(self.bookinfo.get_filepath(self.idx2name[event.GetIndex()]))
+        controls.open_file(self.idx2name[event.GetIndex()])
 
 if __name__ == '__main__':
-    repo = FlatFile('a')
     app = wx.PySimpleApp()
-    frm = BookListFrame(repo)
+    frm = BookListFrame('a')
     frm.Show()
     app.MainLoop()
