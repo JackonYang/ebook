@@ -34,8 +34,23 @@ class FileMeta:
     def update_status(self, status):
         self.status= status
 
+    @classmethod
+    def parse(cls, str):
+        return FileMeta(*json.loads(str))
+
     def __str__(self):
         return json.dumps([self.file_id, list(self.rawnames), self.dispname, self.status])
+
+
+class FlatFile:
+    """
+    manager of meta info
+    
+    """
+
+    def __init__(self, metafile='meta_info.json'):
+        pass
+
 
 if __name__ == '__main__':
     obj_a = FileMeta('aas2342.pdf', 'hello.pdf')
@@ -47,5 +62,8 @@ if __name__ == '__main__':
     new_obj_a = str(FileMeta(*json.loads(str(obj_a))))
 
     obj_b = FileMeta('aas2342.pdf', ['hello.pdf', 'world.pdf', 'hello.pdf'], 'hello world.pdf', 2)
+    obj_c = FileMeta.parse(new_obj_a)
+
     print new_obj_a
     print new_obj_a == str(obj_b)
+    print str(obj_b) == str(obj_c)
