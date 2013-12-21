@@ -37,7 +37,7 @@ class FlatFile:
     def open_file(self, file_id):
         open_file_(self._file_path(file_id))
 
-    def add_file(self, src_file, metainfo=None):
+    def add_file(self, src_file, metainfo=None, auto_save=True):
         if not os.path.isfile(src_file):
             log.error('%s not exists' % src_file)
             return False
@@ -55,19 +55,23 @@ class FlatFile:
         except Exception as e:
             log.error('failed to copy %s. %s' % (src_file, e))
             return False
-        self.meta_mng.add(metainfo)
-        return metainfo.file_id
+        if self.meta_mng.add(metainfo) and auto_save:
+            self.meta_mng.save()
+            return metainfo.file_id
+        return False
 
-    def add_path(self, src_path, ext='*.pdf'): 
+    def add_path(self, src_path, ext='*.pdf', auto_save=True): 
         for rel_path in os.listdir(src_path):
             abs_path = os.path.join(src_path, rel_path)
             if os.path.isfile(abs_path):
                 if validate_ext(abs_path, ext):
-                    self.add_file(abs_path)
+                    self.add_file(abs_path, auto_save=False)
             elif not _is_ignore_path(rel_path):
-                self.add_path(abs_path, ext)
+                self.add_path(abs_path, ext, auto_save=False)
             else:
                 log.debug('ignore %s' % rel_path)
+        if auto_save:
+            self.meta_mng.save()
 
     def _file_path(self, file_id):
         return os.path.join(self.repo_path, file_id)
