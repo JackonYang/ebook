@@ -19,9 +19,9 @@ Submodule 'util' () registered for path 'util'
 demo
 ----
 
-`$ ./run`
+`$ python view.py`
 
-用户个人目录及下一级子目录的 pdf 文件加入 FlatFile 并展示
+用户个人目录下的 pdf/jpg/png 文件加入 FlatFile 并展示
 
 界面中双击可打开对应文件
 

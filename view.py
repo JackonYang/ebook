@@ -42,10 +42,11 @@ class MyFrame(wx.Frame):
         self.myOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
 
 if __name__ == '__main__':
+    import os
 
     test_dir = 'test_demo'
     repo = FlatFile(test_dir)
-    repo.add_path('.', '*.pdf, jpg,.png,py,')
+    repo.add_path(os.path.expanduser('~'), '*.pdf, jpg,.png,')
     data = repo.meta_mng.get_filemeta()
 
     app = wx.PySimpleApp(1)
