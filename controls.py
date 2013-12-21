@@ -18,8 +18,12 @@ def _is_ignore_path(path, ignore_hiden=True):
 
 def validate_ext(filename, ext_range):
     ext_range = ext_range.strip(',')
+    if ',' in ext_range:
+        ext_seq = ext_range.split(',')
+    else:
+        ext_seq = [ext_range]
     prefix, ext = os.path.splitext(filename)
-    if ext.strip('.') in [item.strip('*. ') for item in ext_range.split(',')]:
+    if ext.strip('.') in [item.strip('*. ') for item in ext_seq]:
         return True
     return False
 
