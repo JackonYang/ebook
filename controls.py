@@ -1,7 +1,7 @@
 # -*- coding: utf-8-*-
 import os
 import shutil
-from model import FileMeta, MetaManager
+import model
 from util.util import md5_for_file
 from util.util import open_file as open_file_
 from util.wise_log import operate_log, debug_log
@@ -36,7 +36,7 @@ class FlatFile:
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
-        self.meta_mng = MetaManager(os.path.join(self.repo_path, metafile))
+        model.build_repo(os.path.join(self.repo_path, metafile))
 
     def open_file(self, file_id):
         open_file_(self._file_path(file_id))
@@ -59,8 +59,8 @@ class FlatFile:
         except Exception as e:
             op_log.error('failed to copy %s. %s' % (src_file, e))
             return False
-        if self.meta_mng.add(metainfo) and auto_save:
-            self.meta_mng.save()
+        if model.add(metainfo) and auto_save:
+            model.save()
             return metainfo.file_id
         return False
 
@@ -75,7 +75,10 @@ class FlatFile:
             else:
                 op_log.debug('ignore %s' % rel_path)
         if auto_save:
-            self.meta_mng.save()
+            model.save()
+
+    def get_filemeta(self):
+        return model.get_filemeta()
 
     def _file_path(self, file_id):
         return os.path.join(self.repo_path, file_id)
@@ -84,7 +87,7 @@ class FlatFile:
     def _build_meta(cls, src_file):
         rawname, ext = os.path.splitext(os.path.basename(src_file))
         file_id = '%s%s' % (md5_for_file(src_file), ext)
-        return FileMeta(file_id, rawname)
+        return model.FileMeta(file_id, rawname)
 
 if __name__ == '__main__':
     log.debug('debug mode begin')

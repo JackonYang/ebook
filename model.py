@@ -1,5 +1,56 @@
+"""manage a series of file metas base on file-storage
+
+@method add: add one file meta. ignore if exists.
+@method get_filemeta: return a list of corresponding file metas.
+@method load: load file meta for file
+@method save: save file meta to file
+
+"""
 import json
 import os
+
+metafile = None
+metainfo = None
+
+def build_repo(filename='meta.json'):
+    global metafile
+    global metainfo
+    metafile = filename
+    metainfo = {meta.file_id: meta for meta in load(metafile)}  # load meta info from file
+
+def add(meta):
+    # ignore if exists
+    if meta.file_id in metainfo:
+        return False
+    metainfo[meta.file_id] = meta
+    return True
+
+def get_filemeta(file_ids=None):
+    if file_ids is None:
+        return list(metainfo.values())
+    elif isinstance(file_ids, basestring):
+        file_ids = [file_ids]
+    return [metainfo[file_id] for file_id in file_ids]
+
+def load(metafile):
+    metas = []
+    if os.path.isfile(metafile):
+        with open(metafile, 'r') as f:
+            metas = [FileMeta.parse(item) for item in json.loads(f.read())]
+    return metas
+
+def save():
+    with open(metafile, 'w') as f:
+        f.write(
+                json.dumps([str(meta) for meta in get_filemeta()],
+                           indent=4,
+                           sort_keys=True)
+                )
+
+def __clear():
+    metainfo = {}
+    if os.path.isfile(metafile):
+        os.remove(metafile)
 
 
 class FileMeta:
@@ -26,6 +77,10 @@ class FileMeta:
             return ','.join(self.rawname)
         return self.dispname
 
+    def set_dispname(self, dispname):
+        self.dispname = dispname
+        save()
+
     def get_rawname(self):
         return ','.join(self.rawname)
 
@@ -46,55 +101,6 @@ class FileMeta:
         return json.dumps([self.file_id, list(self.rawname), self.dispname, self.status])
 
 
-class MetaManager:
-    """manage a series of file metas base on file-storage
-
-    @method add: add one file meta. ignore if exists.
-    @method get_filemeta: return a list of corresponding file metas.
-    @method load: load file meta for file
-    @method save: save file meta to file
-
-    """
-
-    def __init__(self, metafile='meta.json'):
-        self.metafile = metafile
-        self.metainfo = {meta.file_id: meta for meta in self.load(metafile)}  # load meta info from file
-
-    def add(self, meta):
-        # ignore if exists
-        if meta.file_id in self.metainfo:
-            return False
-        self.metainfo[meta.file_id] = meta
-        return True
-
-    def get_filemeta(self, file_ids=None):
-        if file_ids is None:
-            return list(self.metainfo.values())
-        elif isinstance(file_ids, basestring):
-            file_ids = [file_ids]
-        return [self.metainfo[file_id] for file_id in file_ids]
-
-    def load(self, metafile):
-        metas = []
-        if os.path.isfile(metafile):
-            with open(metafile, 'r') as f:
-                metas = [FileMeta.parse(item) for item in json.loads(f.read())]
-        return metas
-
-    def save(self):
-        with open(self.metafile, 'w') as f:
-            f.write(
-                    json.dumps([str(meta) for meta in self.get_filemeta()],
-                               indent=4,
-                               sort_keys=True)
-                    )
-
-    def __clear(self):
-        self.metainfo = {}
-        if os.path.isfile(self.metafile):
-            os.remove(self.metafile)
-
-
 if __name__ == '__main__':
     print '----------- FileMeta -------------'
     obj_a = FileMeta('aas2342.pdf', 'hello.pdf')
@@ -111,18 +117,16 @@ if __name__ == '__main__':
     print str(obj_b) == str(obj_c)
     
     print '----------- MetaManager -------------'
-    mng_a = MetaManager()
+    build_repo()
     obj_d = FileMeta('bbs2343.pdf', 'vivian.pdf')
-    print mng_a.add(obj_a)
-    print mng_a.add(obj_d)
-    mng_a.save()
-    mng_b = MetaManager()
-    print False == mng_b.add(obj_a)
-    print False == mng_b.add(obj_d)
-    print len(mng_b.get_filemeta()) == 2
+    print add(obj_a)
+    print add(obj_d)
+    save()
+    print False == add(obj_a)
+    print False == add(obj_d)
+    print len(get_filemeta()) == 2
 
-    for mng in mng_a.get_filemeta():
+    for mng in get_filemeta():
         print mng
 
-    mng_a._MetaManager__clear()
-    mng_b._MetaManager__clear()
+    __clear()

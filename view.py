@@ -35,7 +35,7 @@ class MyFrame(wx.Frame):
 
     def InitObjectListView(self):
         self.myOlv.SetColumns([
-            ColumnDefn("Title", "left", 220, "get_dispname", stringConverter='%s'),
+            ColumnDefn("Title", "left", 220, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
             ColumnDefn("Raw File Name", "left", 220, "get_rawname", stringConverter='%s'),
         ])
         self.myOlv.SetObjects(self.files)
@@ -46,8 +46,10 @@ if __name__ == '__main__':
 
     test_dir = 'test_demo'
     repo = FlatFile(test_dir)
-    repo.add_path(os.path.expanduser('~'), '*.pdf, jpg,.png,')
-    data = repo.meta_mng.get_filemeta()
+    # add_path = '/media/document/book/calibre'
+    add_path = os.path.expanduser('~')
+    repo.add_path(add_path, '*.pdf,')
+    data = repo.get_filemeta()
 
     app = wx.PySimpleApp(1)
     wx.InitAllImageHandlers()
