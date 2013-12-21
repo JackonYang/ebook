@@ -46,7 +46,7 @@ class FileMeta:
 class MetaManager:
     """manage a series of file metas base on file-storage
 
-    @method add_filemeta: add one file meta. ignore if exists.
+    @method add: add one file meta. ignore if exists.
     @method get_filemeta: return a list of corresponding file metas.
     @method load: load file meta for file
     @method save: save file meta to file
@@ -57,7 +57,7 @@ class MetaManager:
         self.metafile = metafile
         self.metainfo = {meta.file_id: meta for meta in self.load(metafile)}  # load meta info from file
 
-    def add_filemeta(self, meta):
+    def add(self, meta):
         # ignore if exists
         if meta.file_id in self.metainfo:
             return False
@@ -110,12 +110,12 @@ if __name__ == '__main__':
     print '----------- MetaManager -------------'
     mng_a = MetaManager()
     obj_d = FileMeta('bbs2343.pdf', 'vivian.pdf')
-    print mng_a.add_filemeta(obj_a)
-    print mng_a.add_filemeta(obj_d)
+    print mng_a.add(obj_a)
+    print mng_a.add(obj_d)
     mng_a.save()
     mng_b = MetaManager()
-    print False == mng_b.add_filemeta(obj_a)
-    print False == mng_b.add_filemeta(obj_d)
+    print False == mng_b.add(obj_a)
+    print False == mng_b.add(obj_d)
     print len(mng_b.get_filemeta()) == 2
 
     for mng in mng_a.get_filemeta():

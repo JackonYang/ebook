@@ -1,64 +1,97 @@
 # -*- coding: utf-8-*-
 import os
-from model import FlatFile
+import shutil
+from model import FileMeta, MetaManager
 from util.util import md5_for_file
 from util.util import open_file as open_file_
 from util.wise_log import operate_log, debug_log
 log = debug_log()
-op_log = operate_log()
+# op_log = operate_log()
 
-filelist = None
+ignore_seq = {'.git', 'log'}  # read from config
+def _is_ignore_path(path, ignore_hiden=True):
+    if ignore_hiden and path.startswith('.'):
+        return True
+    if path in ignore_seq:
+        return True
+    return False
 
-def build_repo(repo_path, idx_file='index.json'):
-    global filelist
-    try:
-        filelist = FlatFile(repo_path, idx_file)
-    except ValueError:
-        raise ValueError('json loads %s error' % idx_file)
+def validate_ext(filename, ext_range):
+    ext_range = ext_range.strip(',')
+    prefix, ext = os.path.splitext(filename)
+    if ext.strip('.') in [item.strip('*. ') for item in ext_range.split(',')]:
+        return True
+    return False
 
-def get_filelist(matches='*.*'):
-    return filelist.get_filelist()
 
-def get_rawname(idx_file):
-    return filelist.get_rawname(idx_file)
+class FlatFile:
 
-def get_dispname(idx_file):
-    return filelist.get_dispname(idx_file)
+    def __init__(self, repo_path, metafile='meta.json'):
+        self.repo_path = repo_path
+        ignore_seq.add(repo_path)
+        if not os.path.exists(self.repo_path):
+            os.makedirs(self.repo_path)
 
-def update_dispname(idx_name, disp_name):
-    filelist.update_dispname(idx_name, disp_name)
+        self.meta_mng = MetaManager(os.path.join(self.repo_path, metafile))
 
-def open_file(filename):
-    open_file_(filelist.get_filepath(filename))
+    def open_file(self, file_id):
+        open_file_(self._file_path(file_id))
 
-def add(book_path, tar_ext='.pdf', depth=10, del_orig=False, is_root=True):
+    def add_file(self, src_file, metainfo=None):
+        if not os.path.isfile(src_file):
+            log.error('%s not exists' % src_file)
+            return False
 
-    if depth < 0:
-        return
-    if is_root:
-        # backup first
-        op_log.info('add %s to BookList' % book_path)
+        if metainfo is None:
+            metainfo = self._build_meta(src_file)
 
-    if os.path.isfile(book_path):
-        orig_name, ext = os.path.splitext(os.path.basename(book_path))
-        if ext.endswith(tar_ext):  # add file
-            idx_name = '%s%s' % (md5_for_file(book_path), ext)
-            if filelist.add_file(book_path, idx_name, del_orig):  # success. add file
-                filelist.add_idx(idx_name, orig_name)
-                op_log.info('success, add (%s, %s) to booklist' % (orig_name, idx_name))
+        dst_file = self._file_path(metainfo.file_id)
+        # cp src_file dst_file
+        try:
+            if not os.path.isfile(dst_file):
+                log.debug('cp %s' % src_file)
+                shutil.copy(src_file, dst_file)
+            log.info('add %s' % src_file)
+        except Exception as e:
+            log.error('failed to copy %s. %s' % (src_file, e))
+            return False
+        self.meta_mng.add(metainfo)
+        return metainfo.file_id
+
+    def add_path(self, src_path, ext='*.pdf'): 
+        for rel_path in os.listdir(src_path):
+            abs_path = os.path.join(src_path, rel_path)
+            if os.path.isfile(abs_path):
+                if validate_ext(abs_path, ext):
+                    self.add_file(abs_path)
+            elif not _is_ignore_path(rel_path):
+                self.add_path(abs_path, ext)
             else:
-                op_log.error('failed, add (%s, %s) to booklist' % (orig_name, idx_name))
-        else:
-            log.info('ignore %s for target extension is %s' % (book_path, tar_ext))
-    elif os.path.isdir(book_path):
-        for root, dirs, files in os.walk(book_path):
-            for name in dirs:
-                add(os.path.join(root, name), tar_ext, depth=depth-1, del_orig=del_orig, is_root=False)
-                # delete empty dirs and log
-            for name in files:
-                add(os.path.join(root, name), tar_ext, depth=depth-1, del_orig=del_orig, is_root=False)
-    else:
-        log.error('%s should be a file or path' % book_path)
+                log.debug('ignore %s' % rel_path)
 
-    if is_root:
-        filelist.save()
+    def _file_path(self, file_id):
+        return os.path.join(self.repo_path, file_id)
+
+    @classmethod
+    def _build_meta(cls, src_file):
+        rawname, ext = os.path.splitext(os.path.basename(src_file))
+        file_id = '%s%s' % (md5_for_file(src_file), ext)
+        return FileMeta(file_id, rawname)
+
+if __name__ == '__main__':
+    log.debug('debug mode begin')
+    print FlatFile._build_meta(__file__) 
+    test_dir = 'demo_repo'
+    if os.path.exists(test_dir):
+        log.debug('rm test dir %s' % test_dir)
+        shutil.rmtree(test_dir)
+    repo = FlatFile(test_dir)
+    log.debug('cp follows by add')
+    file_id = repo.add_file(__file__)
+    print file_id
+    repo.add_path('.', '*.pdf, jpg,.png,')
+
+    log.debug('add without cp')
+    repo.add_path('.', '*.pdf, jpg,.png,')
+    # repo.open_file(file_id)
+    log.debug('debug mode begin')
