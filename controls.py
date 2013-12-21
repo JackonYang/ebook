@@ -6,7 +6,7 @@ from util.util import md5_for_file
 from util.util import open_file as open_file_
 from util.wise_log import operate_log, debug_log
 log = debug_log()
-# op_log = operate_log()
+op_log = operate_log()
 
 ignore_seq = {'.git', 'log'}  # read from config
 def _is_ignore_path(path, ignore_hiden=True):
@@ -49,11 +49,11 @@ class FlatFile:
         # cp src_file dst_file
         try:
             if not os.path.isfile(dst_file):
-                log.debug('cp %s' % src_file)
+                op_log.debug('cp %s' % src_file)
                 shutil.copy(src_file, dst_file)
-            log.info('add %s' % src_file)
+            op_log.info('add %s' % src_file)
         except Exception as e:
-            log.error('failed to copy %s. %s' % (src_file, e))
+            op_log.error('failed to copy %s. %s' % (src_file, e))
             return False
         if self.meta_mng.add(metainfo) and auto_save:
             self.meta_mng.save()
@@ -69,7 +69,7 @@ class FlatFile:
             elif not _is_ignore_path(rel_path):
                 self.add_path(abs_path, ext, auto_save=False)
             else:
-                log.debug('ignore %s' % rel_path)
+                op_log.debug('ignore %s' % rel_path)
         if auto_save:
             self.meta_mng.save()
 
