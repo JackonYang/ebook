@@ -5,20 +5,20 @@ import wx
 
 from ObjectListView import ObjectListView, ColumnDefn
 
-import model
+from controls import FlatFile
 
 class MyFrame(wx.Frame):
-    def __init__(self, *args, **kwds):
+    def __init__(self, data, *args, **kwds):
         wx.Frame.__init__(self, *args, **kwds)
-        self.Init()
+        self.Init(data)
 
-    def Init(self):
-        self.InitModel()
+    def Init(self, data):
+        self.InitModel(data)
         self.InitWidgets()
         self.InitObjectListView()
 
-    def InitModel(self):
-        self.files = model.get_md5file()
+    def InitModel(self, data):
+        self.files = data
 
     def InitWidgets(self):
         panel = wx.Panel(self, -1)
@@ -35,17 +35,23 @@ class MyFrame(wx.Frame):
 
     def InitObjectListView(self):
         self.myOlv.SetColumns([
-            ColumnDefn("md5 Title", "left", 120, "md5_code"),
-            ColumnDefn("raw name", "center", 100, "rawname"),
-            ColumnDefn("show name", "left", 100, "showname"),
+            ColumnDefn("Title", "left", 220, "get_dispname", stringConverter='%s'),
+            ColumnDefn("Raw File Name", "left", 220, "get_rawname", stringConverter='%s'),
         ])
         self.myOlv.SetObjects(self.files)
         self.myOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
 
 if __name__ == '__main__':
+
+    test_dir = 'test_demo'
+    repo = FlatFile(test_dir)
+    repo.add_path('.', '*.pdf, jpg,.png,py,')
+    data = repo.meta_mng.get_filemeta()
+
     app = wx.PySimpleApp(1)
     wx.InitAllImageHandlers()
-    frame_1 = MyFrame(None, -1, "ObjectListView Simple Example1")
+
+    frame_1 = MyFrame(data, None, -1, "Flat File Explorer")
     app.SetTopWindow(frame_1)
     frame_1.Show()
     app.MainLoop()

@@ -6,7 +6,7 @@ class FileMeta:
     """meta info of a flat file
     
     @attr file_id: file id, immuttable. for example: md5.ext.
-    @attr rawnames: set of raw filenames. support add only.
+    @attr rawname: set of raw filenames. support add only.
     @attr dispname: str of display name. only 1 name is supported. support update only.
     @attr status: int flat of status. support update only.
     
@@ -15,9 +15,9 @@ class FileMeta:
     def __init__(self, file_id, rawname, dispname=None, status=1):
         self.file_id = file_id
         if isinstance(rawname, basestring):
-            self.rawnames = {rawname}
+            self.rawname = {rawname}
         else:
-            self.rawnames = set(rawname)
+            self.rawname = set(rawname)
         self.dispname = dispname
         self.status = status
 
@@ -26,8 +26,11 @@ class FileMeta:
             return ','.join(self.rawname)
         return self.dispname
 
+    def get_rawname(self):
+        return ','.join(self.rawname)
+
     def add_rawname(self, rawname):
-        self.rawnames.add(rawname)
+        self.rawname.add(rawname)
 
     def update_dispname(self, dispname):
         self.dispname = dispname
@@ -40,7 +43,7 @@ class FileMeta:
         return FileMeta(*json.loads(str))
 
     def __str__(self):
-        return json.dumps([self.file_id, list(self.rawnames), self.dispname, self.status])
+        return json.dumps([self.file_id, list(self.rawname), self.dispname, self.status])
 
 
 class MetaManager:
