@@ -8,17 +8,18 @@ from ObjectListView import ObjectListView, ColumnDefn
 from controls import FlatFile
 
 class MyFrame(wx.Frame):
-    def __init__(self, data, *args, **kwds):
+    def __init__(self, file_repo, *args, **kwds):
         wx.Frame.__init__(self, *args, **kwds)
-        self.Init(data)
+        self.file_repo = file_repo
+        self.Init()
 
-    def Init(self, data):
-        self.InitModel(data)
+    def Init(self):
+        self.InitModel()
         self.InitWidgets()
         self.InitObjectListView()
 
-    def InitModel(self, data):
-        self.files = data
+    def InitModel(self):
+        self.files = self.file_repo.get_filemeta()
 
     def InitWidgets(self):
         panel = wx.Panel(self, -1)
@@ -33,6 +34,8 @@ class MyFrame(wx.Frame):
 
         self.Layout()
 
+        self.myOlv.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnOpenFile)  # dlick to open a file
+
     def InitObjectListView(self):
         self.myOlv.SetColumns([
             ColumnDefn("Title", "left", 220, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
@@ -41,6 +44,12 @@ class MyFrame(wx.Frame):
         self.myOlv.SetObjects(self.files)
         self.myOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
 
+    def OnOpenFile(self, event):
+        obj = self.myOlv.GetSelectedObject()
+        self.file_repo.open_file(obj.file_id)
+        
+        #open_file(os.path.join(repo_path, self.idx2name[event.GetIndex()]))
+
 if __name__ == '__main__':
     import os
 
@@ -48,13 +57,11 @@ if __name__ == '__main__':
     repo = FlatFile(test_dir)
     # add_path = '/media/document/book/calibre'
     add_path = os.path.expanduser('~')
-    repo.add_path(add_path, '*.pdf,')
-    data = repo.get_filemeta()
-
+    # repo.add_path(add_path, '*.pdf,')
     app = wx.PySimpleApp(1)
     wx.InitAllImageHandlers()
 
-    frame_1 = MyFrame(data, None, -1, "Flat File Explorer")
+    frame_1 = MyFrame(repo, None, -1, "Flat File Explorer")
     app.SetTopWindow(frame_1)
     frame_1.Show()
     app.MainLoop()
