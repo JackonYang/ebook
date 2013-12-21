@@ -36,7 +36,7 @@ class MyFrame(wx.Frame):
     def InitObjectListView(self):
         self.myOlv.SetColumns([
             ColumnDefn("Title", "left", 220, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
-            ColumnDefn("Raw File Name", "left", 220, "get_rawname", stringConverter='%s'),
+            ColumnDefn("Raw File Name", "left", 220, "get_rawname", stringConverter='%s', isEditable=False),
         ])
         self.myOlv.SetObjects(self.files)
         self.myOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
