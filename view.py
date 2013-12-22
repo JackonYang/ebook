@@ -31,14 +31,18 @@ class FlatFileFrame(wx.Frame):
 
         self.myOlv = ObjectListView(panel, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(self.myOlv, 1, wx.ALL|wx.EXPAND, 4)
-        panel.SetSizer(sizer_2)
+        sizer_2.Add(self.myOlv, 10, wx.ALL|wx.EXPAND, 4)
 
         self.SearchFile = wx.SearchCtrl(panel)
+        sizer_2.Add(self.SearchFile, 1, wx.ALL|wx.EXPAND, 2)
+        self.BtnAddPath = wx.Button(panel, -1, 'select path to add files')
+        sizer_2.Add(self.BtnAddPath, 1, wx.ALL|wx.EXPAND, 2)
+        panel.SetSizer(sizer_2)
 
         self.Layout()
 
         self.myOlv.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnOpenFile)  # dlick to open a file
+        self.Bind(wx.EVT_BUTTON, self.OnAddPath, self.BtnAddPath)
 
     def InitObjectListView(self):
         self.myOlv.SetColumns([
@@ -51,6 +55,14 @@ class FlatFileFrame(wx.Frame):
     def OnOpenFile(self, event):
         obj = self.myOlv.GetSelectedObject()
         self.file_repo.open_file(obj.file_id)
+
+    def OnAddPath(self, event):
+        dialog = wx.DirDialog(None, "Choose a directory:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
+        if dialog.ShowModal() == wx.ID_OK:
+            path = dialog.GetPath()
+            self.file_repo.add_path(path)
+        dialog.Destroy()
+        self.myOlv.RefreshObject(self.file_repo.get_filemeta())
 
     def OnTextSearchCtrl(self, event, searchCtrl, olv):
         searchCtrl.ShowCancelButton(len(searchCtrl.GetValue()))
