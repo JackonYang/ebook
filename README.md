@@ -15,9 +15,9 @@ git submodule update
 demo
 ----
 
-`$ python view.py`
+`$ ./run.sh`
 
-1. add `.pdf` file under home path to FlatFile
+1. add `.pdf` file
 2. `F2` to rename display filename
 3. double click to open corresponding file
 
