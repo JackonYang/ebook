@@ -61,6 +61,7 @@ class FlatFileFrame(wx.Frame):
         if dialog.ShowModal() == wx.ID_OK:
             path = dialog.GetPath()
             self.file_repo.add_path(path)
+            self.file_repo.save()
         dialog.Destroy()
         self.myOlv.RefreshObject(self.file_repo.get_filemeta())
 
@@ -90,15 +91,20 @@ class FlatFileFrame(wx.Frame):
 
 if __name__ == '__main__':
     import os
+    import sys
 
-    test_dir = 'test_demo'
+    print sys.getdefaultencoding()
+
+    test_dir = 'demo_repo'
     repo = FlatFile(test_dir)
     # add_path = '/media/document/book/calibre'
     add_path = os.path.expanduser('~')
-    # repo.add_path(add_path, '*.pdf,')
-    app = wx.PySimpleApp(1)
-    wx.InitAllImageHandlers()
+    repo.add_path(add_path, '*.pdf,')
+    repo.save()
 
+    # app = wx.PySimpleApp(1)
+    app = wx.PySimpleApp(redirect = False)
+    wx.InitAllImageHandlers()
     frame_1 = FlatFileFrame(repo, None, -1, "Flat File Explorer")
     app.SetTopWindow(frame_1)
     frame_1.Show()
