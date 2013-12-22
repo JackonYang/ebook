@@ -52,9 +52,10 @@ class FlatFile:
         open_file_(self._file_path(file_id))
 
     def add_file(self, src_file, metainfo=None):
+        count = 0
         if not os.path.isfile(src_file):
             op_log.error('file %s not exists' % src_file)
-            return 0
+            return count
 
         if metainfo is None:
             metainfo = self._build_meta(src_file)
@@ -73,7 +74,8 @@ class FlatFile:
             # add meta info
             if model.update_if_exists(metainfo):
                 op_log.info('add %s' % src_file)
-        return 1
+                count = 1
+        return count
 
     def add_path(self, src_path, ext='*.pdf'):
         if not os.path.exists(src_path):
