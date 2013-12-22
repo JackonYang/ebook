@@ -1,3 +1,8 @@
+#project ignore
+book_path
+book_cache
+local_settings.py
+
 *.py[cod]
 
 #vim

@@ -65,6 +65,8 @@ class FlatFile:
         return False
 
     def add_path(self, src_path, ext='*.pdf', auto_save=True): 
+        if not os.path.exists(src_path):
+            return False
         for rel_path in os.listdir(src_path):
             abs_path = os.path.join(src_path, rel_path)
             if os.path.isfile(abs_path):
