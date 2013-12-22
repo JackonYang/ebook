@@ -29,25 +29,25 @@ class FlatFileFrame(wx.Frame):
         sizer_1.Add(panel, 1, wx.ALL|wx.EXPAND)
         self.SetSizer(sizer_1)
 
-        self.myOlv = ObjectListView(panel, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
         sizer_2 = wx.BoxSizer(wx.VERTICAL)
-        sizer_2.Add(self.myOlv, 10, wx.ALL|wx.EXPAND, 4)
-
         self.SearchFile = wx.SearchCtrl(panel)
         sizer_2.Add(self.SearchFile, 1, wx.ALL|wx.EXPAND, 2)
-        self.BtnAddPath = wx.Button(panel, -1, 'select path to add files')
-        sizer_2.Add(self.BtnAddPath, 1, wx.ALL|wx.EXPAND, 2)
+        self.myOlv = ObjectListView(panel, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
+        sizer_2.Add(self.myOlv, 20, wx.ALL|wx.EXPAND, 4)
+
+        # self.BtnAddPath = wx.Button(panel, -1, 'select path to add files')
+        # sizer_2.Add(self.BtnAddPath, 1, wx.ALL|wx.EXPAND, 2)
         panel.SetSizer(sizer_2)
 
         self.Layout()
 
         self.myOlv.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnOpenFile)  # dlick to open a file
-        self.Bind(wx.EVT_BUTTON, self.OnAddPath, self.BtnAddPath)
+        # self.Bind(wx.EVT_BUTTON, self.OnAddPath, self.BtnAddPath)
 
     def InitObjectListView(self):
         self.myOlv.SetColumns([
             ColumnDefn("Title", "left", 420, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
-            ColumnDefn("Raw File Name", "left", 220, "get_rawname", stringConverter='%s', isEditable=False),
+            ColumnDefn("Raw File Name", "left", 420, "get_rawname", stringConverter='%s', isEditable=False),
         ])
         self.myOlv.SetObjects(self.files)
         self.myOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
