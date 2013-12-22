@@ -1,19 +1,15 @@
-Flat File
-=========
+Flat File Explorer
+==================
 
-扁平化的只读文件管理器
+Flat file explorer for raadonly files
 
-环境依赖
---------
-
-`$ ./install.sh`
-
-输出
+dev-env
+-------
 
 ```
-Requirement already satisfied (use --upgrade to upgrade): wxpython in /usr/lib/python2.7/dist-packages/wx-2.8-gtk2-unicode (from -r requirement.txt (line 1))
-Cleaning up...
-Submodule 'util' () registered for path 'util'
+sudo pip install -r requirement.txt
+git submodule init  # util module
+git submodule update
 ```
 
 demo
@@ -21,8 +17,16 @@ demo
 
 `$ python view.py`
 
-用户个人目录下的 pdf/jpg/png 文件加入 FlatFile 并展示
+1. add `.pdf` file under home path to FlatFile
+2. `F2` to rename display filename
+3. double click to open corresponding file
 
-界面中双击可打开对应文件
+![deom](doc/home.png)
 
-![界面](doc/home.png)
+feature
+-------
+
+1. add file with specific extensions.
+2. add files under specific path, ignore path under ingore list
+3. `F2` to rename display filename
+4. double click to open corresponding file
