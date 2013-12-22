@@ -4,9 +4,10 @@ import shutil
 import model
 from util.util import md5_for_file
 from util.util import open_file as open_file_
+import settings
 from util.wise_log import operate_log, debug_log
 log = debug_log()
-op_log = operate_log()
+op_log = operate_log(settings.log_path)
 
 ignore_seq = {'.git', 'log'}  # read from config
 def _is_ignore_path(path, ignore_hiden=True):
