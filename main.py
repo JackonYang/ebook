@@ -11,7 +11,9 @@ from controls import FlatFile
 
 repo = FlatFile(settings.repo_path)
 
-repo.add_path(settings.cache_path, '*.pdf')
+for path in settings.to_add:
+    print 'begin to add path %s' % path
+    print repo.add_path(path, '*.pdf')
 repo.save()
 
 app = wx.PySimpleApp(redirect = False)
