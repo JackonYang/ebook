@@ -9,6 +9,7 @@ import view
 from control import FlatFile
 
 
+print 'start on repo: %s' % settings.repo_path
 controller = FlatFile(settings.repo_path)
 
 for path in settings.to_add:

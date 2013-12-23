@@ -36,8 +36,10 @@ class Manager:
             self.elements = {ele.primary_key: ele for ele in eles}
 
     def save(self):
+        data = [unicode(ele) for ele in self.get_all()]
+        data.sort()
         with codecs.open(self.datafile, 'w', 'utf8') as f:
-            f.write(json.dumps([unicode(ele) for ele in self.get_all()], **_json_kwargs))
+            f.write(json.dumps(data, **_json_kwargs))
 
     def get_all(self):
         return list(self.elements.values())
@@ -57,6 +59,9 @@ class Manager:
             meth(ele)
             return False
         return True
+
+    def remove(self, ele):
+        return self.elements.pop(ele.primary_key, None)
 
 
 class FileMeta:

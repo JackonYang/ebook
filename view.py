@@ -41,6 +41,7 @@ class FlatFileFrame(wx.Frame):
         self.Layout()
 
         self.myOlv.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.OnOpenFile)  # dlick to open a file
+        self.myOlv.Bind(wx.EVT_LIST_KEY_DOWN, self.OnKeyDown)
         # self.Bind(wx.EVT_BUTTON, self.OnAddPath, self.BtnAddPath)
 
     def InitObjectListView(self):
@@ -67,6 +68,14 @@ class FlatFileFrame(wx.Frame):
     def OnOpenFile(self, event):
         obj = self.myOlv.GetSelectedObject()
         self.controller.open(obj)
+
+    def OnKeyDown(self, event):
+        key = event.GetKeyCode()
+        if wx.WXK_DELETE == key:
+            objs = self.myOlv.GetSelectedObjects()
+            self.controller.delete(objs)
+            self.controller.save()
+            self.myOlv.RemoveObjects(objs)
 
     def OnAddPath(self, event):
         dialog = wx.DirDialog(None, "Choose a directory:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
