@@ -69,6 +69,8 @@ class FileMeta:
     
     """
 
+    mng = None
+
     def __init__(self, file_id, rawname, dispname=None, status=1):
         self.file_id = file_id
         if isinstance(rawname, str):
@@ -83,6 +85,10 @@ class FileMeta:
     @property
     def primary_key(self):
         return self.file_id
+
+    @classmethod
+    def setup_repo(cls, repo_name, mng=Manager):
+        cls.mng = mng(FileMeta, repo_name)
 
     @classmethod
     def parse(cls, string):
@@ -117,10 +123,14 @@ class FileMeta:
     #@save_on_change
     def set_dispname(self, dispname):
         self.dispname = dispname
+        if self.mng:
+            self.mng.save()
 
     #@save_on_change
     def set_status(self, status):
         self.status = status
+        if self.mng:
+            self.mng.save()
 
     def __unicode__(self):
         return json.dumps([self.file_id, list(self.rawname), self.dispname, self.status], encoding='utf8')
@@ -141,17 +151,17 @@ if __name__ == '__main__':
     print str_obj_a
     print unicode(obj_c) == str_obj_a
     
-    print '----------- MetaManager -------------'
-    build_repo()
+    print '----------- Manager -------------'
+    FileMeta.setup_repo('test.json')
     obj_d = FileMeta('bbs2343.pdf', 'vivian.pdf')
-    print add(obj_a)
-    print add(obj_d)
-    save()
-    print False == add(obj_a)
-    print False == add(obj_d)
-    print len(get_filemeta()) == 2
+    print FileMeta.mng.add(obj_a)
+    print FileMeta.mng.add(obj_d)
+    FileMeta.mng.save()
+    print False == FileMeta.mng.add(obj_a)
+    print False == FileMeta.mng.add(obj_d)
+    print len(FileMeta.mng.get_all()) == 2
 
-    for mng in get_filemeta():
-        print unicode(mng)
+    for meta in FileMeta.mng.get_all():
+        print unicode(meta)
 
-    __clear()
+    # __clear()
