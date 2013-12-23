@@ -6,12 +6,11 @@ import wx
 from ObjectListView import ObjectListView, ColumnDefn
 from ObjectListView import Filter
 
-from controls import FlatFile
 
 class FlatFileFrame(wx.Frame):
-    def __init__(self, file_repo, *args, **kwds):
+    def __init__(self, controller, *args, **kwds):
         wx.Frame.__init__(self, *args, **kwds)
-        self.file_repo = file_repo
+        self.controller = controller
         self.Init()
 
     def Init(self):
@@ -21,7 +20,7 @@ class FlatFileFrame(wx.Frame):
         self.InitSearchCtrls()
 
     def InitModel(self):
-        self.files = self.file_repo.get_filemeta()
+        self.elements = self.controller.get_elements()
 
     def InitWidgets(self):
         panel = wx.Panel(self, -1)
@@ -49,21 +48,37 @@ class FlatFileFrame(wx.Frame):
             ColumnDefn("Title", "left", 420, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
             ColumnDefn("Raw File Name", "left", 420, "get_rawname", stringConverter='%s', isEditable=False),
         ])
-        self.myOlv.SetObjects(self.files)
+        self.myOlv.SetObjects(self.elements)
         self.myOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK
+
+    def InitSearchCtrls(self):
+        """Initialize the search controls"""
+        for (searchCtrl, olv) in [(self.SearchFile, self.myOlv)]:
+            # Use default parameters to pass extra information to the event handler
+            def _handleText(evt, searchCtrl=searchCtrl, olv=olv):
+                self.OnTextSearchCtrl(evt, searchCtrl, olv)
+            def _handleCancel(evt, searchCtrl=searchCtrl, olv=olv):
+                self.OnCancelSearchCtrl(evt, searchCtrl, olv)
+
+            searchCtrl.Bind(wx.EVT_TEXT, _handleText)
+            searchCtrl.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, _handleCancel)
+            olv.SetFilter(Filter.TextSearch(olv, olv.columns[0:4]))
+
+        
+        #open_file(os.path.join(repo_path, self.idx2name[event.GetIndex()]))
 
     def OnOpenFile(self, event):
         obj = self.myOlv.GetSelectedObject()
-        self.file_repo.open_file(obj.file_id)
+        self.controller.open_file(obj.file_id)
 
     def OnAddPath(self, event):
         dialog = wx.DirDialog(None, "Choose a directory:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
         if dialog.ShowModal() == wx.ID_OK:
             path = dialog.GetPath()
-            self.file_repo.add_path(path)
-            self.file_repo.save()
+            self.controller.add_path(path)
+            self.controller.save()
         dialog.Destroy()
-        self.myOlv.RefreshObject(self.file_repo.get_filemeta())
+        self.myOlv.RefreshObject(self.controller.get_elements())
 
     def OnTextSearchCtrl(self, event, searchCtrl, olv):
         searchCtrl.ShowCancelButton(len(searchCtrl.GetValue()))
@@ -74,38 +89,23 @@ class FlatFileFrame(wx.Frame):
         searchCtrl.SetValue("")
         self.OnTextSearchCtrl(event, searchCtrl, olv)
 
-    def InitSearchCtrls(self):
-        """Initialize the search controls"""
-        for (searchCtrl, olv) in [(self.SearchFile, self.myOlv)]:
-            # Use default parameters to pass extra information to the event handler
-            def _handleText(evt, searchCtrl=searchCtrl, olv=olv):
-                self.OnTextSearchCtrl(evt, searchCtrl, olv)
-            def _handleCancel(evt, searchCtrl=searchCtrl, olv=olv):
-                self.OnCancelSearchCtrl(evt, searchCtrl, olv)
-            searchCtrl.Bind(wx.EVT_TEXT, _handleText)
-            searchCtrl.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, _handleCancel)
-            olv.SetFilter(Filter.TextSearch(olv, olv.columns[0:4]))
-
-        
-        #open_file(os.path.join(repo_path, self.idx2name[event.GetIndex()]))
 
 if __name__ == '__main__':
     import os
     import sys
-
-    print sys.getdefaultencoding()
+    import control
 
     test_dir = 'demo_repo'
-    repo = FlatFile(test_dir)
+    controller = control.FlatFile(test_dir)
     # add_path = '/media/document/book/calibre'
     add_path = os.path.expanduser('~')
-    repo.add_path(add_path, '*.pdf,')
-    repo.save()
+    controller.add_path(add_path, '*.pdf,')
+    controller.save()
 
     # app = wx.PySimpleApp(1)
     app = wx.PySimpleApp(redirect = False)
     wx.InitAllImageHandlers()
-    frame_1 = FlatFileFrame(repo, None, -1, "Flat File Explorer")
+    frame_1 = FlatFileFrame(controller, None, -1, "Flat File Explorer")
     app.SetTopWindow(frame_1)
     frame_1.Show()
     app.MainLoop()

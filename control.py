@@ -1,7 +1,7 @@
 # -*- coding: utf-8-*-
 import os
 import shutil
-import model
+from model import FileMeta
 from util.util import md5_for_file
 from util.util import open_file as open_file_
 import settings
@@ -46,7 +46,7 @@ class FlatFile:
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
-        model.build_repo(os.path.join(self.repo_path, metafile))
+        FileMeta.setup_repo(os.path.join(self.repo_path, metafile))
 
     def open_file(self, file_id):
         open_file_(self._file_path(file_id))
@@ -72,7 +72,7 @@ class FlatFile:
 
         if os.path.isfile(dst_file):
             # add meta info
-            if model.update_if_exists(metainfo):
+            if FileMeta.mng.add_if_exists(metainfo):
                 op_log.info('add %s' % src_file)
                 count = 1
         return count
@@ -94,10 +94,10 @@ class FlatFile:
         return added
 
     def save(self):
-        model.save()
+        FileMeta.mng.save()
 
-    def get_filemeta(self):
-        return model.get_filemeta()
+    def get_elements(self):
+        return FileMeta.mng.get_all()
 
     def _file_path(self, file_id):
         return os.path.join(self.repo_path, file_id)
@@ -106,7 +106,7 @@ class FlatFile:
     def _build_meta(cls, src_file):
         rawname, ext = os.path.splitext(os.path.basename(src_file))
         file_id = '%s%s' % (md5_for_file(src_file), ext)
-        return model.FileMeta(file_id, rawname)
+        return FileMeta(file_id, rawname)
 
 if __name__ == '__main__':
     log.debug('debug mode begin')
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     repo2.add_path('.', '*.pdf, jpg,.png,')
     repo.save()
 
-    os.remove(model.metafile)
+    os.remove(FileMeta.mng.datafile)
     log.debug('add without cp')
     repo3 = FlatFile(test_dir)
     repo3.add_file(__file__)
