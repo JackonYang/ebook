@@ -6,7 +6,8 @@ to_add = ['/media/document/lean-read/media/books',
           '/media/document/book/calibre',
           '/media/document/downloads',
           ]
-log_path = os.path.join(repo_path, 'log')
+op_log_path = os.path.join(repo_path, 'log')  # operate log
+metafile = 'meta.json'
 
 ignore_seq = {'.git', 'log'}  # read from config
 

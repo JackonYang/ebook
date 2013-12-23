@@ -11,7 +11,7 @@ if __name__ == '__main__':
     op_log = operate_log()
 else:
     log = debug_log()
-    op_log = operate_log(settings.log_path)
+    op_log = operate_log(settings.op_log_path)
 
 _ignore_seq = settings.ignore_seq
 
@@ -46,10 +46,10 @@ class FlatFile:
         if not os.path.exists(self.repo_path):
             os.makedirs(self.repo_path)
 
-        FileMeta.setup_repo(os.path.join(self.repo_path, metafile))
+        FileMeta.init_mng(os.path.join(self.repo_path, metafile))
 
-    def open_file(self, file_id):
-        open_file_(self._file_path(file_id))
+    def open(self, obj):
+        open_file(self._file_path(obj.file_id))
 
     def add_file(self, src_file, metainfo=None):
         count = 0

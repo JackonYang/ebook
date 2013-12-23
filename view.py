@@ -64,12 +64,9 @@ class FlatFileFrame(wx.Frame):
             searchCtrl.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, _handleCancel)
             olv.SetFilter(Filter.TextSearch(olv, olv.columns[0:4]))
 
-        
-        #open_file(os.path.join(repo_path, self.idx2name[event.GetIndex()]))
-
     def OnOpenFile(self, event):
         obj = self.myOlv.GetSelectedObject()
-        self.controller.open_file(obj.file_id)
+        self.controller.open(obj)
 
     def OnAddPath(self, event):
         dialog = wx.DirDialog(None, "Choose a directory:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)

@@ -87,7 +87,7 @@ class FileMeta:
         return self.file_id
 
     @classmethod
-    def setup_repo(cls, repo_name, mng=Manager):
+    def init_mng(cls, repo_name, mng=Manager):
         cls.mng = mng(FileMeta, repo_name)
 
     @classmethod
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     print unicode(obj_c) == str_obj_a
     
     print '----------- Manager -------------'
-    FileMeta.setup_repo('test.json')
+    FileMeta.init_mng('test.json')
     obj_d = FileMeta('bbs2343.pdf', 'vivian.pdf')
     print FileMeta.mng.add(obj_a)
     print FileMeta.mng.add(obj_d)
