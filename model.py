@@ -17,57 +17,46 @@ _json_kwargs = {'indent': 4,
                 'sort_keys': True,
                }
 
-metafile = None
-metainfo = None
-auto_save = True
+class Manager:
+    def __init__(self, client, datafile):
+        self.client = client  # model managed 
+        self.datafile = datafile
+        self.elements = {}
+        self.load()
 
+    def load(self, src_file=None):
+        """load meta info from file
+        
+        """
+        if src_file is None:
+            src_file = self.datafile
+        if os.path.isfile(src_file):
+            with codecs.open(src_file, 'r', 'utf8') as f:
+                eles = [self.client.parse(item) for item in json.loads(f.read(), encoding='utf8')]
+            self.elements = {ele.primary_key: ele for ele in eles}
 
-def build_repo(filename='meta.json'):
-    global metafile
-    global metainfo
-    metafile = filename
-    metainfo = {meta.file_id: meta for meta in load(metafile)}  # load meta info from file
+    def save(self):
+        with codecs.open(self.datafile, 'w', 'utf8') as f:
+            f.write(json.dumps([unicode(ele) for ele in self.get_all()], **_json_kwargs))
 
-def update_if_exists(meta):
-    if not add(meta):
-        obj = metainfo[meta.file_id]
-        obj.add_rawname(meta.rawname)
-        return False
-    return True
+    def get_all(self):
+        return list(self.elements.values())
 
-def add(meta):
-    # ignore if exists
-    if meta.file_id in metainfo:
-        return False
-    metainfo[meta.file_id] = meta
-    return True
+    def add(self, ele):
+        """do nothing if exists
 
-def get_filemeta():
-    return list(metainfo.values())
+        """
+        if ele.primary_key in self.elements:
+            return False
+        self.elements[ele.primary_key] = ele
+        return True
 
-def load(metafile):
-    metas = []
-    if os.path.isfile(metafile):
-        with codecs.open(metafile, 'r', 'utf8') as f:
-            metas = [FileMeta.parse(item) for item in json.loads(f.read(), encoding='utf8')]
-    return metas
-
-def save():
-    with codecs.open(metafile, 'w', 'utf8') as f:
-        f.write(json.dumps([unicode(meta) for meta in get_filemeta()], **_json_kwargs))
-
-def __clear():
-    metainfo = {}
-    if os.path.isfile(metafile):
-        os.remove(metafile)
-
-def save_on_change(func):
-    def _save_on_change(*args, **kwargs):
-        ret = func(*args, **kwargs)
-        if metafile:
-            save()
-        return ret
-    return _save_on_change
+    def add_if_exists(self, ele, method='merge'):
+        if not self.add(ele):
+            meth = getattr(self.elements[ele.primary_key], method)
+            meth(ele)
+            return False
+        return True
 
 
 class FileMeta:
@@ -91,9 +80,23 @@ class FileMeta:
         self.dispname = dispname
         self.status = status
 
+    @property
+    def primary_key(self):
+        return self.file_id
+
     @classmethod
     def parse(cls, string):
         return FileMeta(*json.loads(string, encoding='utf8'))
+
+    def merge(self, meta):
+        # merge rawname
+        self.add_rawname(meta.rawname)
+        if self.dispname is None:
+            self.dispname = meta.dispname
+
+    def update(self, meta):
+        self.add_rawname(meta.rawname)
+        self.dispname = meta.dispname
 
     def get_dispname(self):
         if not self.dispname:
@@ -111,11 +114,11 @@ class FileMeta:
             rawname = {rawname}
         self.rawname.update(rawname)
 
-    @save_on_change
+    #@save_on_change
     def set_dispname(self, dispname):
         self.dispname = dispname
 
-    @save_on_change
+    #@save_on_change
     def set_status(self, status):
         self.status = status
 
