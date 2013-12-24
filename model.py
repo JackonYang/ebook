@@ -97,13 +97,10 @@ class FileMeta:
         cls.mng = mng(FileMeta, repo_name)
         return cls.mng
 
-    @classmethod
-    def parse(cls, string):
-        return FileMeta(*json.loads(string, encoding='utf8'))
-
     def merge(self, meta):
         # merge rawname
         self.add_rawname(meta.rawname)
+        # update if None
         if self.dispname is None:
             self.dispname = meta.dispname
 
@@ -143,8 +140,19 @@ class FileMeta:
         if self.mng:
             self.mng.save()
 
+    @classmethod
+    def parse(cls, string):
+        return FileMeta(**json.loads(string, encoding='utf8'))
+
     def __unicode__(self):
-        return json.dumps([self.file_id, list(self.rawname), self.dispname, self.status, self.sizeInBytes], encoding='utf8')
+        obj = {'file_id': self.file_id,
+               'rawname': list(self.rawname),
+               'dispname': self.dispname,
+               'status': self.status,
+               'sizeInBytes': self.sizeInBytes,
+               }
+        #return json.dumps([self.file_id, list(self.rawname), self.dispname, self.status, self.sizeInBytes], encoding='utf8')
+        return json.dumps(obj, **_json_kwargs)
 
 
 if __name__ == '__main__':
