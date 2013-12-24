@@ -105,7 +105,8 @@ class FlatFile:
     def _build_meta(cls, src_file):
         rawname, ext = os.path.splitext(os.path.basename(src_file))
         file_id = '%s%s' % (md5_for_file(src_file), ext)
-        return FileMeta(file_id, rawname)
+        sizeInBytes = os.path.getsize(src_file)
+        return FileMeta(file_id, rawname, sizeInBytes=sizeInBytes)
 
 if __name__ == '__main__':
     log.debug('debug mode begin')

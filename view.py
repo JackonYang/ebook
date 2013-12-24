@@ -47,6 +47,7 @@ class FlatFileFrame(wx.Frame):
     def InitObjectListView(self):
         self.myOlv.SetColumns([
             ColumnDefn("Title", "left", 420, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
+            ColumnDefn("Size (MB)", "center", 100, "get_sizeInMb", stringConverter='%.1f', isEditable=False),
             ColumnDefn("Raw File Name", "left", 420, "get_rawname", stringConverter='%s', isEditable=False),
         ])
         self.myOlv.SetObjects(self.elements)

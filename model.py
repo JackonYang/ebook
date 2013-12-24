@@ -76,7 +76,7 @@ class FileMeta:
 
     mng = None
 
-    def __init__(self, file_id, rawname, dispname=None, status=1):
+    def __init__(self, file_id, rawname, dispname=None, status=1, sizeInBytes=0):
         self.file_id = file_id
         if isinstance(rawname, str):
             self.rawname = {rawname.decode('utf8')}
@@ -86,6 +86,7 @@ class FileMeta:
             self.rawname = set(rawname)
         self.dispname = dispname
         self.status = status
+        self.sizeInBytes = sizeInBytes
 
     @property
     def primary_key(self):
@@ -94,6 +95,7 @@ class FileMeta:
     @classmethod
     def init_mng(cls, repo_name, mng=Manager):
         cls.mng = mng(FileMeta, repo_name)
+        return cls.mng
 
     @classmethod
     def parse(cls, string):
@@ -118,6 +120,10 @@ class FileMeta:
         # print self.rawname
         return ','.join(self.rawname)
 
+    def get_sizeInMb(self):
+        # print self.rawname
+        return self.sizeInBytes / (1024.0*1024.0)
+
     def add_rawname(self, rawname):
         if isinstance(rawname, str):
             rawname = {rawname.decode('utf8')}
@@ -138,7 +144,7 @@ class FileMeta:
             self.mng.save()
 
     def __unicode__(self):
-        return json.dumps([self.file_id, list(self.rawname), self.dispname, self.status], encoding='utf8')
+        return json.dumps([self.file_id, list(self.rawname), self.dispname, self.status, self.sizeInBytes], encoding='utf8')
 
 
 if __name__ == '__main__':
