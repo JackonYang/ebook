@@ -29,17 +29,19 @@ class FlatFile:
         open_file(self._file_path(obj.file_id))
 
     def add_file(self, src_file, metainfo=None):
-        count = 0
+        added = 0
+        # check file existance
         if not os.path.isfile(src_file):
             op_log.error('file %s not exists' % src_file)
-            return count
+            return added
 
+        # build meta info
         if metainfo is None:
             metainfo = self._build_meta(src_file)
 
+        # cp src_file dst_file
         dst_file = self._file_path(metainfo.file_id)
         if not os.path.isfile(dst_file):
-            # cp src_file dst_file
             try:
                 shutil.copy(src_file, dst_file)
             except Exception as e:
@@ -47,12 +49,12 @@ class FlatFile:
             else:
                 op_log.debug('cp %s' % src_file)
 
+        # add meta info to repo
         if os.path.isfile(dst_file):
-            # add meta info
             if FileMeta.mng.add_if_exists(metainfo):
                 op_log.info('add %s, src file: %s' % (metainfo.file_id, src_file))
-                count = 1
-        return count
+                added += 1
+        return added
 
     def add_path(self, src_path, ext='*.pdf'):
         # not exists
