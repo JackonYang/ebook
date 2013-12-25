@@ -1,21 +1,24 @@
 Log
 ===
 
-operate info log
-----------------
+operation log
+-------------
 
 record user's writing operation
 
+#### LEVEL-INFO
+
 1. add: raw filename, md5 code, timestamp.
 
-    ignore orig path, for multi file path maybe exists and it costs too much to record it. What's more, it has little value. only to revert or analysis local file distribution.
+    ignore origin path, reason: there can be multi path of a file and it is a little tricky to record and retrieve it.
+    the only 2 usage that I can imagine is to revert adding or analysis local file distribution.
 
 2. del file from repo: md5 code, timestamp.
 
-    ignore filename, for it has been recored while adding.
+    ignore filename, reason: it has been recored while adding.
 
-3. rename: log nothing, for we do not care about it.
+3. rename: log nothing, reason: we do not care about its history.
 
-4. copy file to repo: ignore, for necessary info is logged in add raw filename.
+4. copy file to repo: ignore, reason: necessary info is logged while adding raw filename.
 
-5. del file from local disk: ignore, for necessary info is logged in del file from repo.
+5. del file from local disk: ignore, reason: if VIP deleted, we can retrieve it from repo by rawname.
