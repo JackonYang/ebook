@@ -46,10 +46,11 @@ class FlatFileFrame(wx.Frame):
 
     def InitObjectListView(self):
         self.myOlv.SetColumns([
-            ColumnDefn("Title", "left", 420, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
-            ColumnDefn("Size (MB)", "center", 100, "get_sizeInMb", stringConverter='%.1f', isEditable=False),
-            ColumnDefn("Added Time", "center", 200, "get_addtime", stringConverter='%s', isEditable=False),
-            ColumnDefn("Raw File Name", "left", 420, "get_rawname", stringConverter='%s', isEditable=False),
+            ColumnDefn("Title", "left", 360, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
+            ColumnDefn("Brief Commit", "left", 420, "get_commit", stringConverter='%s', valueSetter='set_commit'),
+            ColumnDefn("Size (MB)", "center", 80, "get_sizeInMb", stringConverter='%.1f', isEditable=False),
+            ColumnDefn("Added Time", "center", 180, "get_addtime", stringConverter='%s', isEditable=False),
+            # ColumnDefn("Raw File Name", "left", 420, "get_rawname", stringConverter='%s', isEditable=False),
         ])
         self.myOlv.SetObjects(self.elements)
         self.myOlv.cellEditMode = ObjectListView.CELLEDIT_SINGLECLICK

@@ -77,7 +77,7 @@ class FileMeta:
 
     mng = None
 
-    def __init__(self, file_id, rawname, addtime=0, dispname=None, status=1, sizeInBytes=0):
+    def __init__(self, file_id, rawname, addtime=0, dispname=None, status=1, sizeInBytes=0, commit=''):
         self.file_id = file_id
         if isinstance(rawname, str):
             self.rawname = {rawname.decode('utf8')}
@@ -89,6 +89,7 @@ class FileMeta:
         self.dispname = dispname
         self.status = status
         self.sizeInBytes = sizeInBytes
+        self.commit = commit
 
     @property
     def primary_key(self):
@@ -109,6 +110,14 @@ class FileMeta:
     def update(self, meta):
         self.add_rawname(meta.rawname)
         self.dispname = meta.dispname
+
+    def set_commit(self, commit):
+        self.commit = commit
+        if self.mng:
+            self.mng.save()
+
+    def get_commit(self):
+        return self.commit
 
     def get_dispname(self):
         if not self.dispname:
@@ -155,6 +164,7 @@ class FileMeta:
                'addtime': self.addtime,
                'status': self.status,
                'sizeInBytes': self.sizeInBytes,
+               'commit': self.commit,
                }
         #return json.dumps([self.file_id, list(self.rawname), self.dispname, self.status, self.sizeInBytes], encoding='utf8')
         return json.dumps(obj, **_json_kwargs)
