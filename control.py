@@ -49,7 +49,7 @@ class FlatFile:
         if os.path.isfile(dst_file):
             # add meta info
             if FileMeta.mng.add_if_exists(metainfo):
-                op_log.info('add %s' % src_file)
+                op_log.info('add %s, src file: %s' % (metainfo.file_id, src_file))
                 count = 1
         return count
 

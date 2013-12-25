@@ -1,30 +1,33 @@
 Flat File Explorer
 ==================
 
-Flat file explorer for raadonly files
+Flat file explorer for read-only files
 
-dev-env
+Dev-env
 -------
 
 ```
-sudo pip install -r requirement.txt
-git submodule init  # util module
-git submodule update
+$ sudo pip install -r requirement.txt
+$ git submodule init  # util module
+$ git submodule update
 ```
 
-demo
+Demo
 ----
 
 `$ ./run.sh`
 
-1. add `.pdf` file
-2. `F2` to rename display filename
-3. double click to open corresponding file
+1. auto add `.pdf` file when startup
+2. `F2` to rename file title
+3. `Del`  key to delete file
+4. double click to open corresponding file
+5. searh
+
 
 ![deom](doc/home.png)
 
-feature
--------
+More Feature
+------------
 
 1. add file with specific extensions.
 2. add files under specific path, ignore path under ingore list
