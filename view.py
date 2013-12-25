@@ -48,6 +48,7 @@ class FlatFileFrame(wx.Frame):
         self.myOlv.SetColumns([
             ColumnDefn("Title", "left", 420, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
             ColumnDefn("Size (MB)", "center", 100, "get_sizeInMb", stringConverter='%.1f', isEditable=False),
+            ColumnDefn("Added Time", "center", 200, "get_addtime", stringConverter='%s', isEditable=False),
             ColumnDefn("Raw File Name", "left", 420, "get_rawname", stringConverter='%s', isEditable=False),
         ])
         self.myOlv.SetObjects(self.elements)
@@ -105,9 +106,9 @@ if __name__ == '__main__':
     test_dir = 'demo_repo'
     controller = control.FlatFile(test_dir)
     # add_path = '/media/document/book/calibre'
-    add_path = os.path.expanduser('~')
-    controller.add_path(add_path, '*.pdf,')
-    controller.save()
+    #add_path = os.path.expanduser('~')
+    #controller.add_path(add_path, '*.pdf,')
+    #controller.save()
 
     # app = wx.PySimpleApp(1)
     app = wx.PySimpleApp(redirect = False)

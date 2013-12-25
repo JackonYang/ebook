@@ -1,5 +1,6 @@
 # -*- coding: utf-8-*-
 import os
+import time
 import shutil
 from model import FileMeta
 from validate import is_deleted, is_ignore, validate_ext
@@ -104,9 +105,12 @@ class FlatFile:
     @classmethod
     def _build_meta(cls, src_file):
         rawname, ext = os.path.splitext(os.path.basename(src_file))
-        file_id = '%s%s' % (md5_for_file(src_file), ext)
-        sizeInBytes = os.path.getsize(src_file)
-        return FileMeta(file_id, rawname, sizeInBytes=sizeInBytes)
+        info = {'file_id': '%s%s' % (md5_for_file(src_file), ext),
+                'rawname': rawname,
+                'sizeInBytes': os.path.getsize(src_file),
+                'addtime': time.time(),
+                }
+        return FileMeta(**info)
 
 if __name__ == '__main__':
     log.debug('debug mode begin')

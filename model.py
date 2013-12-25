@@ -10,6 +10,7 @@
 import json
 import os
 import codecs
+import time
 
 _json_kwargs = {'indent': 4,
                 'separators': (',', ': '),
@@ -76,7 +77,7 @@ class FileMeta:
 
     mng = None
 
-    def __init__(self, file_id, rawname, dispname=None, status=1, sizeInBytes=0):
+    def __init__(self, file_id, rawname, addtime=0, dispname=None, status=1, sizeInBytes=0):
         self.file_id = file_id
         if isinstance(rawname, str):
             self.rawname = {rawname.decode('utf8')}
@@ -84,6 +85,7 @@ class FileMeta:
             self.rawname = {rawname}
         else:
             self.rawname = set(rawname)
+        self.addtime = addtime
         self.dispname = dispname
         self.status = status
         self.sizeInBytes = sizeInBytes
@@ -118,8 +120,10 @@ class FileMeta:
         return ','.join(self.rawname)
 
     def get_sizeInMb(self):
-        # print self.rawname
         return self.sizeInBytes / (1024.0*1024.0)
+
+    def get_addtime(self):
+        return time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(self.addtime))
 
     def add_rawname(self, rawname):
         if isinstance(rawname, str):
@@ -148,6 +152,7 @@ class FileMeta:
         obj = {'file_id': self.file_id,
                'rawname': list(self.rawname),
                'dispname': self.dispname,
+               'addtime': self.addtime,
                'status': self.status,
                'sizeInBytes': self.sizeInBytes,
                }
