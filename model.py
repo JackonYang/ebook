@@ -11,6 +11,7 @@ import json
 import os
 import codecs
 import time
+import sys
 
 _json_kwargs = {'indent': 4,
                 'separators': (',', ': '),
@@ -80,7 +81,7 @@ class FileMeta:
     def __init__(self, file_id, rawname, addtime=0, dispname=None, status=1, sizeInBytes=0, commit=''):
         self.file_id = file_id
         if isinstance(rawname, str):
-            self.rawname = {rawname.decode('utf8')}
+            self.rawname = {rawname.decode(sys.getfilesystemencoding())}
         elif isinstance(rawname, unicode):
             self.rawname = {rawname}
         else:
