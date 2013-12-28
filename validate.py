@@ -1,8 +1,15 @@
 import os
+import sys
 import re
+from cfg import get_cfg
 import settings
+import codecs
+import fnmatch
+from util.util import is_hiden
 
 tar_file = os.path.join(settings.op_log_path, 'info.log')
+
+para_cfg = get_cfg()
 
 ptn = re.compile(r'\|INFO\|del\s+(.+?\.pdf)')
 def get_dels():
@@ -12,23 +19,33 @@ def get_dels():
         return ptn.findall(content)
     return []
 
+
 def get_ignore():
-    return settings.ignore_seq
+    return para_cfg['ignore']
+
+
+def utf8_required(func):
+    def wrap(path, *args, **kwargs):
+        if isinstance(path, str):
+            path = path.decode(sys.getfilesystemencoding())
+        return func(path, *args, **kwargs)
+    return wrap
+
 
 _deleted = get_dels()
 def is_deleted(file_id):
     return file_id in _deleted
 
-_ignore = get_ignore()
+@utf8_required
 def is_ignore(path, ignore_hiden=True):
     # ignore_hiden
-    if ignore_hiden and path.startswith('.'):
+    if ignore_hiden and is_hiden(path):
         return True
 
     # ignore _ignore_seq
-    if path in _ignore:
-        return True
-
+    for ptn in get_ignore():
+        if fnmatch.fnmatch(path, ptn):
+            return True
     return False
 
 def validate_ext(filename, ext_range):
@@ -43,5 +60,6 @@ def validate_ext(filename, ext_range):
     return False
 
 if __name__ == '__main__':
+    print get_ignore()
     print is_deleted('adfadf')
     print is_deleted('7e1a8aac1699e1ffc0a4eadbcc5dc07e.pdf')
