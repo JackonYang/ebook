@@ -55,5 +55,41 @@ def add_file(src_file):
 def add_path(root, ext, ignore):
     return walk(root, add_file, ext, ignore)
 
+
+def get_all():
+    return bookmeta.get_all()
+
+
+def open(obj):
+    dst_file = os.path.join(
+        bookfile_path,
+        '%s%s' % (obj.file_id, obj.file_ext)
+    )
+    try:
+        open_file(dst_file)  # what if file deleted
+    except Exception as e:
+        dlog.error('open file %s error. %s' % (dst_file, e))
+
+
+def delete(objs):
+    if isinstance(objs, bookmeta.BookMeta):
+        objs = [objs]
+    for obj in objs:
+        op_log.info('del %s' % obj.file_id)
+        bookfile = os.path.join(
+            bookfile_path,
+            '%s%s' % (obj.file_id, obj.file_ext)
+        )
+        metafile = bookmeta.get_metafile(obj.file_id)
+
+        for tarfile in [bookfile, metafile]:
+            if os.path.isfile(tarfile):
+                op_log.debug('rm %s' % tarfile)
+                os.remove(tarfile)
+
+
 if __name__ == '__main__':
     add_path('.', '.py', '.git')
+    for obj in get_all():
+        delete(obj)
+    open(obj)
