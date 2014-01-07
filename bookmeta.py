@@ -79,6 +79,10 @@ def _clean_str(string):
     return string
 
 
+def get_all():
+    return [load(fname) for fname in os.listdir(_root_path)]
+
+
 class BookMeta:
     def __init__(self, file_id, file_ext, rawname, dispname, **additional):
         # make sure that all inputs are utf-8 encoding
@@ -150,10 +154,10 @@ if __name__ == '__main__':
         'worldccc', 'pdf', ['rawname2', 'rawname3'], 'hello world',
         sizeInBytes=1024000
     )
-    c = load(os.path.join(_root_path, 'worldccc.json'))
-    d = load('worldccc')
+    print get_all()
+    c = load('worldccc')
     print unicode(c)
-    print unicode(c) == unicode(d)
+    print unicode(c) == unicode(b)
     print a.get_dispname()
     print a.dispname
     print a.get_create_time()
