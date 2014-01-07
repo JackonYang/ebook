@@ -20,7 +20,7 @@ class FlatFileFrame(wx.Frame):
         self.InitSearchCtrls()
 
     def InitModel(self):
-        self.elements = self.controller.get_elements()
+        self.elements = self.controller.get_all()
 
     def InitWidgets(self):
         panel = wx.Panel(self, -1)
@@ -46,10 +46,9 @@ class FlatFileFrame(wx.Frame):
 
     def InitObjectListView(self):
         self.myOlv.SetColumns([
-            ColumnDefn("Title", "left", 360, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
-            ColumnDefn("Brief Commit", "left", 420, "get_commit", stringConverter='%s', valueSetter='set_commit'),
+            ColumnDefn("Title", "left", 360, "get_dispname", stringConverter='%s'),
             ColumnDefn("Size (MB)", "center", 80, "get_sizeInMb", stringConverter='%.1f', isEditable=False),
-            ColumnDefn("Added Time", "center", 180, "get_addtime", stringConverter='%s', isEditable=False),
+            ColumnDefn("Create Time", "center", 180, "get_create_time", stringConverter='%s', isEditable=False),
             # ColumnDefn("Raw File Name", "left", 420, "get_rawname", stringConverter='%s', isEditable=False),
         ])
         self.myOlv.SetObjects(self.elements)
@@ -77,7 +76,6 @@ class FlatFileFrame(wx.Frame):
         if wx.WXK_DELETE == key:
             objs = self.myOlv.GetSelectedObjects()
             self.controller.delete(objs)
-            self.controller.save()
             self.myOlv.RemoveObjects(objs)
 
     def OnAddPath(self, event):
@@ -85,9 +83,8 @@ class FlatFileFrame(wx.Frame):
         if dialog.ShowModal() == wx.ID_OK:
             path = dialog.GetPath()
             self.controller.add_path(path)
-            self.controller.save()
         dialog.Destroy()
-        self.myOlv.RefreshObject(self.controller.get_elements())
+        self.myOlv.RefreshObject(self.controller.get_all())
 
     def OnTextSearchCtrl(self, event, searchCtrl, olv):
         searchCtrl.ShowCancelButton(len(searchCtrl.GetValue()))
@@ -102,10 +99,10 @@ class FlatFileFrame(wx.Frame):
 if __name__ == '__main__':
     import os
     import sys
-    import control
+    import workflow
 
     test_dir = 'demo_repo'
-    controller = control.FlatFile(test_dir)
+    controller = workflow
     # add_path = '/media/document/book/calibre'
     #add_path = os.path.expanduser('~')
     #controller.add_path(add_path, '*.pdf,')

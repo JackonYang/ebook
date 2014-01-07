@@ -52,7 +52,7 @@ def add_file(src_file):
     return added
 
 
-def add_path(root, ext, ignore):
+def add_path(root, ext='.pdf', ignore='.git, .*'):
     return walk(root, add_file, ext, ignore)
 
 
