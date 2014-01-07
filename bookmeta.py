@@ -79,6 +79,10 @@ def _clean_str(string):
     return string
 
 
+def exists(file_id):
+    return os.path.isfile(get_metafile(file_id))
+
+
 def get_all():
     return [load(fname) for fname in os.listdir(_root_path)]
 
@@ -164,3 +168,5 @@ if __name__ == '__main__':
     print b.get_create_time()
     print '%.2f(Mb)' % b.get_sizeInMb()
     print '%.2f(Mb)' % a.get_sizeInMb()
+    print exists('worldccc')
+    print exists('aaaaa')
