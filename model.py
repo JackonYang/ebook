@@ -5,7 +5,7 @@ book meta info saved in json file, 1 json file for 1 book.
 @necessary attr: file_id, file_ext, rawname, dispname
 
 abspath is used, use abspath_metafile to get abspath
-input supported: file_id, json file name, abs path, BookMeta obj
+input supported: file_id, json file name, abs path
 
 install_repo before use BookMeta or BookFile
 
@@ -41,16 +41,6 @@ def install_repo(root_path, auto_save=True):
     _auto_save = auto_save
 
 
-def abspath_metafile(file_id):
-    if file_id.startswith(_root_path):
-        return file_id
-    if file_id.endswith('.json'):
-        fname = file_id
-    else:
-        fname = '%s.json' % file_id
-    return os.path.join(_root_path, fname)
-
-
 def load(metafile):
     with codecs.open(abspath_metafile(metafile), 'r', 'utf8') as f:
         content = f.read()
@@ -66,6 +56,22 @@ def _clean_str(string):
     if isinstance(string, str):
         string = string.decode(sys.getfilesystemencoding())
     return string
+
+
+def abspath_metafile(metafile):
+    """get abspath of metafile
+    
+    @para metafile: string is required. abspath/json file/file_id is OK.
+    
+    """
+    if metafile.startswith(_root_path):  # abs path
+        return metafile
+
+    if metafile.endswith('.json'):  # json file
+        fname = metafile
+    else:
+        fname = '%s.json' % metafile  # file_id to json file
+    return os.path.join(_root_path, fname)
 
 
 def exists(file_id):
