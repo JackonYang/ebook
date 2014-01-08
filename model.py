@@ -1,16 +1,16 @@
 # -*- coding: utf-8-*-
-"""book meta info
+"""model for book meta info
 
-1 json file for 1 book to store meta info
+book meta info saved in json file, 1 json file for 1 book.
 @necessary attr: file_id, file_ext, rawname, dispname
 
-abspath is used,
-use get_metafile to get abspath of a file_id or json file
+abspath is used, use abspath_metafile to get abspath
+input supported: file_id, json file name, abs path, BookMeta obj
 
-install_repo before use BookMeta
+install_repo before use BookMeta or BookFile
 
 rawname is save in set and show in str.
-if dispname is None, display rawname without any influence on storage.
+if dispname is None, show rawname without any influence on storage.
 
 """
 import os
@@ -20,7 +20,7 @@ import codecs
 import time
 
 _root_path = None
-_auto_save = True
+_auto_save = True  # when setattr
 _time_fmt = '%Y-%m-%d %H:%M:%S'
 _json_kwargs = {'indent': 4,
                 'separators': (',', ': '),
@@ -41,7 +41,7 @@ def install_repo(root_path, auto_save=True):
     _auto_save = auto_save
 
 
-def get_metafile(file_id):
+def abspath_metafile(file_id):
     if file_id.startswith(_root_path):
         return file_id
     if file_id.endswith('.json'):
@@ -51,19 +51,8 @@ def get_metafile(file_id):
     return os.path.join(_root_path, fname)
 
 
-def _save_meta(meta_obj):
-    """save meta info with name file_id.json
-
-    """
-    if _root_path is None:
-        raise NameError('root path for BookMeta is not defined')
-
-    with codecs.open(get_metafile(meta_obj.file_id), 'w', 'utf8') as f:
-        f.write(unicode(meta_obj))
-
-
 def load(metafile):
-    with codecs.open(get_metafile(metafile), 'r', 'utf8') as f:
+    with codecs.open(abspath_metafile(metafile), 'r', 'utf8') as f:
         content = f.read()
     return BookMeta(**json.loads(content, encoding='utf8'))
 
@@ -80,7 +69,7 @@ def _clean_str(string):
 
 
 def exists(file_id):
-    return os.path.isfile(get_metafile(file_id))
+    return os.path.isfile(abspath_metafile(file_id))
 
 
 def get_all():
@@ -104,8 +93,13 @@ class BookMeta:
             _clean_str(key): _clean_str(value)
             for key, value in additional.items()
         }
-        if _auto_save:
-            _save_meta(self)
+
+    def save(self):
+        if _root_path is None:
+            raise NameError('root path for BookMeta is not defined')
+
+        with codecs.open(abspath_metafile(self.file_id), 'w', 'utf8') as f:
+            f.write(unicode(self))
 
     def __unicode__(self):
         obj = {'file_id': self.file_id,
@@ -119,7 +113,7 @@ class BookMeta:
     def __setattr__(self, name, value, save=None):
         self.__dict__[name] = value
         if _auto_save:
-            _save_meta(self)
+            self.save()
 
     def get_rawname(self):
         return ','.join(self.rawname)
@@ -154,10 +148,12 @@ if __name__ == '__main__':
         'hello.sfd', 'pdf', 'rawname_a', None,  # required attr
         a=4, create_time=time.time()  # additional attr
     )
+    a.save()
     b = BookMeta(
         'worldccc', 'pdf', ['rawname2', 'rawname3'], 'hello world',
         sizeInBytes=1024000
     )
+    b.save()
     print get_all()
     c = load('worldccc')
     print unicode(c)
