@@ -4,10 +4,10 @@
 book meta info saved in json file, 1 json file for 1 book.
 @necessary attr: file_id, file_ext, rawname, dispname
 
-abspath is used, use abspath_metafile to get abspath
+abspath is used by default, use filepath to get path
 input supported: file_id, json file name, abs path
 
-install_repo before use BookMeta or BookFile
+init_mng before use BookMeta or BookFile
 
 rawname is save in set and show in str.
 if dispname is None, show rawname without any influence on storage.
@@ -19,8 +19,9 @@ import json
 import codecs
 import time
 
-_root_path = None
+
 _auto_save = True  # when setattr
+_use_abs_path = True
 _time_fmt = '%Y-%m-%d %H:%M:%S'
 _json_kwargs = {'indent': 4,
                 'separators': (',', ': '),
@@ -29,22 +30,17 @@ _json_kwargs = {'indent': 4,
                 }
 
 
-def install_repo(root_path, auto_save=True):
+def init_mng(root_path):
     """install root_path to save meta info
 
     """
-    global _root_path
-    global _auto_save
-    _root_path = os.path.abspath(root_path)
-    if not os.path.exists(_root_path):
-        os.makedirs(_root_path)
-    _auto_save = auto_save
-
-
-def load(metafile):
-    with codecs.open(abspath_metafile(metafile), 'r', 'utf8') as f:
-        content = f.read()
-    return BookMeta(**json.loads(content, encoding='utf8'))
+    if _use_abs_path:
+        root_path = os.path.abspath(root_path)
+    if not os.path.exists(root_path):
+        os.makedirs(root_path)
+    mng = MetaMng(root_path)
+    BookMeta.mng = mng
+    return mng
 
 
 def _clean_str(string):
@@ -58,31 +54,49 @@ def _clean_str(string):
     return string
 
 
-def abspath_metafile(metafile):
-    """get abspath of metafile
-    
-    @para metafile: string is required. abspath/json file/file_id is OK.
-    
-    """
-    if metafile.startswith(_root_path):  # abs path
-        return metafile
+class MetaMng:
 
-    if metafile.endswith('.json'):  # json file
-        fname = metafile
-    else:
-        fname = '%s.json' % metafile  # file_id to json file
-    return os.path.join(_root_path, fname)
+    def __init__(self, meta_root):
+        self.meta_root = meta_root
 
+    def filepath(self, metafile):
+        """get abspath of metafile
 
-def exists(file_id):
-    return os.path.isfile(abspath_metafile(file_id))
+        @para metafile: string is required. abspath/json file/file_id is OK.
 
+        """
+        if metafile.startswith(self.meta_root):
+            return metafile
+        if not metafile.endswith('.json'):  # file_id
+            metafile = '%s.json' % metafile
+        return os.path.join(self.meta_root, metafile)
 
-def get_all():
-    return [load(fname) for fname in os.listdir(_root_path)]
+    def load(self, filename):
+        with codecs.open(filename, 'r', 'utf8') as f:
+            content = f.read()
+        return BookMeta.parse(content)
+
+    def save(self, meta_obj):
+        with codecs.open(self.filepath(meta_obj.file_id), 'w', 'utf8') as f:
+            f.write(unicode(meta_obj))
+
+    def meta_exists(self, file_id):
+        return os.path.isfile(self.filepath(file_id))
+
+    def get_all(self):
+        metafiles = os.listdir(self.meta_root)
+        return [self.load(self.filepath(fname)) for fname in metafiles]
 
 
 class BookMeta:
+    """Meta info of a single book
+
+    init a manager, and it saves data once attribute changed.
+
+    """
+
+    mng = None
+
     def __init__(self, file_id, file_ext, rawname, dispname, **additional):
         # make sure that all inputs are utf-8 encoding
         self.__dict__['file_id'] = _clean_str(file_id)
@@ -100,14 +114,13 @@ class BookMeta:
             for key, value in additional.items()
         }
 
-    def save(self):
-        if _root_path is None:
-            raise NameError('root path for BookMeta is not defined')
-
-        with codecs.open(abspath_metafile(self.file_id), 'w', 'utf8') as f:
-            f.write(unicode(self))
+    @classmethod
+    def parse(cls, content):
+        """unicode str to obj"""
+        return BookMeta(**json.loads(content, encoding='utf8'))
 
     def __unicode__(self):
+        """obj to unicode str"""
         obj = {'file_id': self.file_id,
                'rawname': list(self.rawname),
                'dispname': self.dispname,
@@ -116,10 +129,10 @@ class BookMeta:
         obj.update(self.additional)
         return json.dumps(obj, **_json_kwargs)
 
-    def __setattr__(self, name, value, save=None):
+    def __setattr__(self, name, value):
         self.__dict__[name] = value
-        if _auto_save:
-            self.save()
+        if _auto_save and self.mng and hasattr(self.mng, 'save'):
+            self.mng.save(self)
 
     def get_rawname(self):
         return ','.join(self.rawname)
@@ -149,19 +162,19 @@ class BookMeta:
 
 
 if __name__ == '__main__':
-    install_repo('test_repo')
+    mng = init_mng('test_repo')
     a = BookMeta(
         'hello.sfd', 'pdf', 'rawname_a', None,  # required attr
         a=4, create_time=time.time()  # additional attr
     )
-    a.save()
+    a.mng.save(a)
     b = BookMeta(
         'worldccc', 'pdf', ['rawname2', 'rawname3'], 'hello world',
         sizeInBytes=1024000
     )
-    b.save()
-    print get_all()
-    c = load('worldccc')
+    mng.save(b)
+    print mng.get_all()
+    c = mng.load(mng.filepath('worldccc'))
     print unicode(c)
     print unicode(c) == unicode(b)
     print a.get_dispname()
@@ -170,5 +183,5 @@ if __name__ == '__main__':
     print b.get_create_time()
     print '%.2f(Mb)' % b.get_sizeInMb()
     print '%.2f(Mb)' % a.get_sizeInMb()
-    print exists('worldccc')
-    print exists('aaaaa')
+    print mng.meta_exists('worldccc')
+    print mng.meta_exists('aaaaa')
