@@ -1,15 +1,10 @@
 import os
 
-BASE_DIR = os.path.dirname(__file__)
-repo_path = os.path.join(BASE_DIR, 'book_repo')
-to_add = ['/media/document/lean-read/media/books',
-          '/media/document/book/calibre',
-          '/media/document/downloads',
-          ]
-op_log_path = os.path.join(repo_path, 'log')  # operate log
-metafile = 'meta.json'
-
-ignore_seq = {'.git', 'log'}  # read from config
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+repo_path = os.path.join(BASE_DIR, 'booklist')
+metafile_path = os.path.join(repo_path, 'metainfo')
+bookfile_path = os.path.join(repo_path, 'bookfile')
+cache_path = os.path.join(repo_path, 'cache')
 
 try:
     from local_settings import *
