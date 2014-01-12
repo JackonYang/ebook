@@ -79,6 +79,14 @@ class MetaMng:
     def save(self, meta_obj):
         with codecs.open(self.filepath(meta_obj.file_id), 'w', 'utf8') as f:
             f.write(unicode(meta_obj))
+    
+    def delete(self, meta_obj):
+        # delete meta file
+        try:
+            os.remove(self.filepath(meta_obj.file_id))
+        except IOError:
+            return 1
+        return None
 
     def meta_exists(self, file_id):
         return os.path.isfile(self.filepath(file_id))
