@@ -5,14 +5,28 @@
 import os
 import codecs
 import shutil
+from model import BookMeta
 
+def build_repo(root_path):
+    """install root_path to save meta info
+
+    """
+    repo = FileStore(root_path)
+    BookMeta.repo = repo
+    return repo
 
 class FileStore:
 
     def __init__(self, root_path):
         self.root_path = os.path.abspath(root_path)
         self.meta_path = os.path.join(self.root_path, 'f_meta')
-        self.src_path = os.path.join(self.root_path, 'f_media')
+        self.media_path = os.path.join(self.root_path, 'f_media')
+
+        for path in [self.meta_path, self.media_path]:
+            if not os.path.exists(path):
+                os.makedirs(path)
+
+        self.meta_ext = '.json'
 
     def load(self, file_id):
         file_id = self._fmt_metafile_path(file_id)
@@ -48,9 +62,9 @@ class FileStore:
 
     # ------ retrieve ----------------
 
-    def get_all(self, meta_obj):
+    def get_all(self):
         metafiles = os.listdir(self.meta_path)
-        return [meta_obj.feed(self.load(self._fmt_metafile_path(fname)))
+        return [BookMeta.feed(self.load(self._fmt_metafile_path(fname)))
                 for fname in metafiles]
 
     # ------ path handler ------------
@@ -72,7 +86,7 @@ class FileStore:
 
         """
         if not metafile.endswith('.json'):  # file_id
-            metafile = '%s.json' % metafile
+            metafile = '%s%s' % (metafile, self.meta_ext)
         return self._format_path(metafile, self.meta_path)
 
     def _format_path(self, p_file, p_root):
