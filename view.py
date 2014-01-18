@@ -49,6 +49,7 @@ class FlatFileFrame(wx.Frame):
             ColumnDefn("Title", "left", 360, "get_dispname", stringConverter='%s'),
             ColumnDefn("Size (MB)", "center", 80, "get_sizeInMb", stringConverter='%.1f', isEditable=False),
             ColumnDefn("Create Time", "center", 180, "get_create_time", stringConverter='%s', isEditable=False),
+            ColumnDefn("MD5", "center", 320, "file_id", stringConverter='%s', isEditable=False),
             # ColumnDefn("Raw File Name", "left", 420, "get_rawname", stringConverter='%s', isEditable=False),
         ])
         self.myOlv.SetObjects(self.elements)
@@ -73,11 +74,28 @@ class FlatFileFrame(wx.Frame):
         self.controller.open_file(filename)
 
     def OnKeyDown(self, event):
+        objs = self.myOlv.GetSelectedObjects()
         key = event.GetKeyCode()
         if wx.WXK_DELETE == key:
-            objs = self.myOlv.GetSelectedObjects()
-            self.controller.delete(objs)
-            self.myOlv.RemoveObjects(objs)
+            self.DoDelete(objs)
+        elif 3 == key:  # wx.WXK_CONTROL_C
+            self.DoCopyFileid(objs)
+
+    def DoDelete(self, objs):
+        for obj in objs:
+            self.controller.delete(obj.file_id, obj.file_ext)
+        self.myOlv.RemoveObjects(objs)
+
+    def DoCopyFileid(self, objs):
+        self.dataObj = wx.TextDataObject()
+        file_ids = ','.join([obj.file_id for obj in objs])
+        wx.MessageBox(file_ids, "MD5 code")
+        # self.dataObj.SetText(file_ids)
+        # if wx.TheClipboard.Open():
+        #   wx.TheClipboard.SetData(self.dataObj)
+        #    wx.TheClipboard.Close()
+        #else:
+        #    wx.MessageBox("Unable to open the clipboard", "Error")
 
     def OnTextSearchCtrl(self, event, searchCtrl, olv):
         searchCtrl.ShowCancelButton(len(searchCtrl.GetValue()))

@@ -49,12 +49,12 @@ class FileStore:
             return 1
         return 0
 
-    def delete(self, file_id):
+    def delete(self, file_id, ext):
         # delete meta file
         try:
             for filepath in [
                 self._fmt_metafile_path(file_id),
-                self._fmt_mediafile_path(file_id)
+                self._fmt_mediafile_path('%s%s' % (file_id, ext))
             ]:
                 os.remove(filepath)
         except IOError:
