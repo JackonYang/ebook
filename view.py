@@ -69,7 +69,8 @@ class FlatFileFrame(wx.Frame):
 
     def OnOpenFile(self, event):
         obj = self.myOlv.GetSelectedObject()
-        self.controller.open(obj)
+        filename = '%s%s' % (obj.file_id, obj.file_ext)
+        self.controller.open_file(filename)
 
     def OnKeyDown(self, event):
         key = event.GetKeyCode()
@@ -77,14 +78,6 @@ class FlatFileFrame(wx.Frame):
             objs = self.myOlv.GetSelectedObjects()
             self.controller.delete(objs)
             self.myOlv.RemoveObjects(objs)
-
-    def OnAddPath(self, event):
-        dialog = wx.DirDialog(None, "Choose a directory:", style=wx.DD_DEFAULT_STYLE | wx.DD_NEW_DIR_BUTTON)
-        if dialog.ShowModal() == wx.ID_OK:
-            path = dialog.GetPath()
-            self.controller.add_path(path)
-        dialog.Destroy()
-        self.myOlv.RefreshObject(self.controller.get_all())
 
     def OnTextSearchCtrl(self, event, searchCtrl, olv):
         searchCtrl.ShowCancelButton(len(searchCtrl.GetValue()))
@@ -97,16 +90,10 @@ class FlatFileFrame(wx.Frame):
 
 
 if __name__ == '__main__':
-    import os
-    import sys
-    import workflow
+    import storage
+    from settings import repo_path
 
-    test_dir = 'demo_repo'
-    controller = workflow
-    # add_path = '/media/document/book/calibre'
-    #add_path = os.path.expanduser('~')
-    #controller.add_path(add_path, '*.pdf,')
-    #controller.save()
+    controller = storage.build_repo(repo_path)
 
     # app = wx.PySimpleApp(1)
     app = wx.PySimpleApp(redirect = False)

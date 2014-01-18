@@ -6,6 +6,7 @@ import os
 import codecs
 import shutil
 from model import BookMeta
+from util.util import open_file as _open_file
 
 def build_repo(root_path):
     """install root_path to save meta info
@@ -62,6 +63,9 @@ class FileStore:
 
     # ------ retrieve ----------------
 
+    def open_file(self, file_id):
+        _open_file(self._fmt_mediafile_path(file_id))
+
     def get_all(self):
         metafiles = os.listdir(self.meta_path)
         return [BookMeta.feed(self.load(self._fmt_metafile_path(fname)))
@@ -79,7 +83,7 @@ class FileStore:
         """get abspath of mediafile
 
         """
-        return self._format_path(mediafile, self.mediafile)
+        return self._format_path(mediafile, self.media_path)
 
     def _fmt_metafile_path(self, metafile):
         """get abspath of metafile
