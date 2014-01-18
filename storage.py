@@ -42,9 +42,11 @@ class FileStore:
             f.write(content)
 
     def update_on_exists(self, file_id, content, src_file):
-        dst_file = self._fmt_mediafile_path(file_id)
+        ext = os.path.splitext(src_file)[1]
         try:
-            shutil.copy(src_file, dst_file)
+            if not self.media_exists(file_id):
+                dst_file = self._fmt_mediafile_path('%s%s' % (file_id, ext))
+                shutil.move(src_file, dst_file)
             self.save(file_id, content)
         except Exception:
             print 'error | add src_file %s' % src_file
