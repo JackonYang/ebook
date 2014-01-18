@@ -8,6 +8,7 @@ import shutil
 from model import BookMeta
 from util.util import open_file as _open_file
 
+
 def build_repo(root_path):
     """install root_path to save meta info
 
@@ -15,6 +16,7 @@ def build_repo(root_path):
     repo = FileStore(root_path)
     BookMeta.repo = repo
     return repo
+
 
 class FileStore:
 
@@ -44,10 +46,11 @@ class FileStore:
         try:
             shutil.copy(src_file, dst_file)
             self.save(file_id, content)
-        except Exception as e:
-            print e
-            return 1
-        return 0
+        except Exception:
+            print 'error | add src_file %s' % src_file
+            return False
+        print 'info | added md5=%s, src_file=%s' % (file_id, src_file)
+        return True
 
     def delete(self, file_id, ext):
         # delete meta file
@@ -58,8 +61,8 @@ class FileStore:
             ]:
                 os.remove(filepath)
         except IOError:
-            return 1
-        return 0
+            return False
+        return True
 
     # ------ retrieve ----------------
 
