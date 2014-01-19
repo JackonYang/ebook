@@ -30,7 +30,7 @@ def add_file(src_file, file_id=None):
         # file exists, add rawname only. do not copy src_file
         meta_obj = BookMeta.feed(store.load(file_id))
         meta_obj.add_rawname(rawname)
-        return store.update_on_exists(file_id, unicode(meta_obj), src_file=None)
+        return store.update_on_exists(file_id, unicode(meta_obj), src_file)
 
     additional = _build_additional(src_file)
     meta_obj = BookMeta(file_id, ext, rawname, None, **additional)
