@@ -111,8 +111,25 @@ class BookMeta:
     def get_sizeInMb(self):
         return self._get_additional_attr('sizeInBytes', 0) / (1024.0*1024.0)
 
+    def get_book_version(self):
+        return self._get_additional_attr('version', '')
+
+    def set_book_version(self, version):
+        return self._set_additional_attr('version', version)
+
+    def get_book_language(self):
+        return self._get_additional_attr('language', '')
+
+    def set_book_language(self, language):
+        return self._set_additional_attr('language', language)
+
     def _get_additional_attr(self, attr, default):
         return self.additional.get(attr, default)
+
+    def _set_additional_attr(self, attr, value):
+        self.additional[attr] = value
+        if _auto_save and self.repo and hasattr(self.repo, 'save'):
+            self.repo.save(self.file_id, unicode(self))
 
 
 if __name__ == '__main__':
