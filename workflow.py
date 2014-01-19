@@ -27,23 +27,24 @@ def add_file(src_file, file_id=None):
     rawname, ext = os.path.splitext(os.path.basename(src_file))
 
     if store.meta_exists(file_id):
-        # file exists, add rawname only
+        # file exists, add rawname only. do not copy src_file
         meta_obj = BookMeta.feed(store.load(file_id))
         meta_obj.add_rawname(rawname)
-    else:
-        additional = _build_additional(src_file)
-        meta_obj = BookMeta(file_id, ext, rawname, None, **additional)
+        return store.update_on_exists(file_id, unicode(meta_obj), src_file=None)
+
+    additional = _build_additional(src_file)
+    meta_obj = BookMeta(file_id, ext, rawname, None, **additional)
     return store.update_on_exists(file_id, unicode(meta_obj), src_file)
 
 
 def add_path(root, ext='.pdf', ignore='.git, .*'):
-    walk(root, add_file, ext, ignore)
+    return walk(root, add_file, ext, ignore)
 
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         for root in sys.argv[1:]:
             print 'begin to add %s' % root
-            add_path(root, '.pdf', '.git, .*')
+            print '%s files added' % add_path(root, '.pdf', '.git, .*')
     else:
         print 'no root'

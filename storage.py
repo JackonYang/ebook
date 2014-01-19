@@ -41,10 +41,10 @@ class FileStore:
         with codecs.open(self._fmt_metafile_path(file_id), 'w', 'utf8') as f:
             f.write(content)
 
-    def update_on_exists(self, file_id, content, src_file):
-        ext = os.path.splitext(src_file)[1]
+    def update_on_exists(self, file_id, content, src_file=None):
         try:
-            if not self.media_exists(file_id):
+            if src_file and not self.media_exists(file_id):
+                ext = os.path.splitext(src_file)[1]
                 dst_file = self._fmt_mediafile_path('%s%s' % (file_id, ext))
                 shutil.move(src_file, dst_file)
             self.save(file_id, content)
