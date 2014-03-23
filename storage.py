@@ -6,7 +6,7 @@ import os
 import codecs
 import shutil
 from model import BookMeta
-from util.util import open_file as _open_file
+from util import open_file as _open_file
 
 
 def build_repo(root_path):

@@ -111,8 +111,8 @@ class FlatFileFrame(wx.Frame):
 
 if __name__ == '__main__':
     import storage
-    from settings import repo_path
 
+    repo_path = r'/media/document/booklist'
     controller = storage.build_repo(repo_path)
 
     # app = wx.PySimpleApp(1)
