@@ -109,16 +109,22 @@ class FlatFileFrame(wx.Frame):
         self.OnTextSearchCtrl(event, searchCtrl, olv)
 
 
+class FlatApp(wx.App):
+
+    def __init__(self, controller):
+        self.controller = controller
+        wx.App.__init__(self)
+
+    def OnInit(self):
+        frame = FlatFileFrame(self.controller, None, -1, "Flat File Explorer")
+        self.SetTopWindow(frame)
+        frame.Show()
+        return True
+
+
 if __name__ == '__main__':
     import storage
-
     repo_path = r'/media/document/booklist'
     controller = storage.build_repo(repo_path)
-
-    # app = wx.PySimpleApp(1)
-    app = wx.PySimpleApp(redirect = False)
-    wx.InitAllImageHandlers()
-    frame_1 = FlatFileFrame(controller, None, -1, "Flat File Explorer")
-    app.SetTopWindow(frame_1)
-    frame_1.Show()
+    app = FlatApp(controller)
     app.MainLoop()
