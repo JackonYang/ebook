@@ -8,8 +8,9 @@ from ObjectListView import Filter
 
 
 class FlatFileFrame(wx.Frame):
-    def __init__(self, controller, *args, **kwds):
-        wx.Frame.__init__(self, *args, **kwds)
+    def __init__(self, controller):
+        FrameStyle = wx.CAPTION|wx.MINIMIZE_BOX|wx.MAXIMIZE_BOX|wx.CLOSE_BOX|wx.RESIZE_BORDER
+        wx.Frame.__init__(self, parent=None, id=wx.ID_ANY, title="Flat File Explorer", pos=(100, 100), size=(500,600), style=FrameStyle)
         self.controller = controller
         self.Init()
 
@@ -116,7 +117,7 @@ class FlatApp(wx.App):
         wx.App.__init__(self)
 
     def OnInit(self):
-        frame = FlatFileFrame(self.controller, None, -1, "Flat File Explorer")
+        frame = FlatFileFrame(self.controller)
         self.SetTopWindow(frame)
         frame.Show()
         return True
