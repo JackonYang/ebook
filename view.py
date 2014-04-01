@@ -69,6 +69,7 @@ class FlatFileFrame(wx.Frame):
 
             searchCtrl.Bind(wx.EVT_TEXT, _handleText)
             searchCtrl.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, _handleCancel)
+            searchCtrl.SetFocus()
             olv.SetFilter(Filter.TextSearch(olv, olv.columns[0:4]))
 
     def OnOpenFile(self, event):
