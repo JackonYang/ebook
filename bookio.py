@@ -8,7 +8,7 @@ import time
 import shutil
 from util import md5_for_file, is_hiden
 
-import db_mongo
+import model
 from settings import media_path, ignore_seq
 
 
@@ -17,7 +17,7 @@ def init_media(path):
         os.makedirs(path)
 
 
-db = db_mongo.connect()
+db = model.connect()
 init_media(media_path)
 
 
