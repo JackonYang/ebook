@@ -43,6 +43,7 @@ class BookMeta:
         return self.meta_info.get('dispname', ','.join(self.meta_info['rawname']))
 
     def set_dispname(self, dispname):
+        self.meta_info['dispname'] = dispname
         db.book.update({'md5': self.meta_info['md5']}, {"$set": {"dispname": dispname}})
 
     def get_md5(self):
