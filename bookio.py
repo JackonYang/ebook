@@ -6,24 +6,19 @@
 import os
 import time
 import shutil
-import pymongo
 from util import md5_for_file, is_hiden
 
-import settings
+import db_mongo
+from settings import media_path, ignore_seq
 
-def connect(ip, port, db_name):
-    conn = pymongo.Connection(ip, port)
-    return conn[db_name]
 
 def init_media(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
 
-db = connect(settings.db_ip, settings.db_port, settings.db_name)
-init_media(settings.media_path)
-media_path = settings.media_path
-_ignore_seq = settings.ignore_seq
+db = db_mongo.connect()
+init_media(media_path)
 
 
 def add_path(src_path, ext_pool='.pdf', ignore_hidden=True):
@@ -51,7 +46,7 @@ def add_path(src_path, ext_pool='.pdf', ignore_hidden=True):
         return 1
     else:  # dir
         added = 0
-        tar_path = set(os.listdir(src_path)) - _ignore_seq  # ignore log/.git etc
+        tar_path = set(os.listdir(src_path)) - ignore_seq  # ignore log/.git etc
         for rel_path in tar_path:
             abs_path = os.path.join(src_path, rel_path)
             if not ignore_hidden or not is_hiden(abs_path):  # ignore hidden
