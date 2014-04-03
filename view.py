@@ -6,6 +6,7 @@ import wx
 from ObjectListView import ObjectListView, ColumnDefn
 from ObjectListView import Filter
 import model
+from util import open_file
 
 
 class FlatFileFrame(wx.Frame):
@@ -74,8 +75,7 @@ class FlatFileFrame(wx.Frame):
 
     def OnOpenFile(self, event):
         obj = self.myOlv.GetSelectedObject()
-        filename = '%s%s' % (obj.file_id, obj.file_ext)
-        self.controller.open_file(filename)
+        open_file(obj.get_media_path())
 
     def OnKeyDown(self, event):
         objs = self.myOlv.GetSelectedObjects()

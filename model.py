@@ -3,10 +3,11 @@
 
 """
 import sys
+import os
 import db_mongo
 
 import pymongo
-from settings import db_ip, db_port, db_name
+from settings import db_ip, db_port, db_name, media_path
 
 
 def connect(ip=db_ip, port=db_port, name=db_name):
@@ -52,6 +53,9 @@ class BookMeta:
 
     def get_book_language(self):
         return self.meta_info.get('language', '')
+    
+    def get_media_path(self):
+        return os.path.join(media_path, '%s%s' % (self.meta_info['md5'], self.meta_info['ext']))
 
 if __name__ == '__main__':
     pass
