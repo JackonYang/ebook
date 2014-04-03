@@ -5,6 +5,7 @@ import wx
 
 from ObjectListView import ObjectListView, ColumnDefn
 from ObjectListView import Filter
+import model
 
 
 class FlatFileFrame(wx.Frame):
@@ -22,7 +23,7 @@ class FlatFileFrame(wx.Frame):
         self.InitSearchCtrls()
 
     def InitModel(self):
-        self.elements = self.controller.get_all()
+        self.elements = model.get_all()
 
     def InitWidgets(self):
         panel = wx.Panel(self, -1)
@@ -48,12 +49,10 @@ class FlatFileFrame(wx.Frame):
 
     def InitObjectListView(self):
         self.myOlv.SetColumns([
-            ColumnDefn("Title", "left", 360, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
-            ColumnDefn("Language", "left", 60, "get_book_language", stringConverter='%s', valueSetter='set_book_language'),
-            ColumnDefn("Version", "left", 60, "get_book_version", stringConverter='%s', valueSetter='set_book_version'),
+            ColumnDefn("Title", "left", 330, "get_dispname", stringConverter='%s', valueSetter='set_dispname'),
+            ColumnDefn("Language", "left", 80, "get_book_language", stringConverter='%s', valueSetter='set_book_language'),
             ColumnDefn("Size (MB)", "center", 80, "get_sizeInMb", stringConverter='%.1f', isEditable=False),
-            ColumnDefn("Create Time", "center", 180, "get_create_time", stringConverter='%s', isEditable=False),
-            ColumnDefn("MD5", "center", 320, "file_id", stringConverter='%s', isEditable=False),
+            ColumnDefn("MD5", "center", 320, "get_md5", stringConverter='%s', isEditable=False),
             # ColumnDefn("Raw File Name", "left", 420, "get_rawname", stringConverter='%s', isEditable=False),
         ])
         self.myOlv.SetObjects(self.elements)
