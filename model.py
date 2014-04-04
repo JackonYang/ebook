@@ -4,7 +4,6 @@
 """
 import sys
 import os
-import db_mongo
 
 import pymongo
 from settings import db_ip, db_port, db_name, media_path
@@ -14,7 +13,7 @@ def connect(ip=db_ip, port=db_port, name=db_name):
     conn = pymongo.Connection(ip, port)
     return conn[name]
 
-db = db_mongo.connect()
+db = connect()
 
 
 def _clean_str(string):

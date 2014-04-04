@@ -10,11 +10,10 @@ from util import open_file
 
 
 class FlatFileFrame(wx.Frame):
-    def __init__(self, controller):
+    def __init__(self):
         FrameStyle = wx.CAPTION | wx.RESIZE_BORDER | wx.SYSTEM_MENU |\
                      wx.MINIMIZE_BOX | wx.MAXIMIZE_BOX | wx.CLOSE_BOX
         wx.Frame.__init__(self, parent=None, id=wx.ID_ANY, title="Flat File Explorer", pos=(100, 100), size=(500,600), style=FrameStyle)
-        self.controller = controller
         self.Init()
 
     def Init(self):
@@ -87,7 +86,8 @@ class FlatFileFrame(wx.Frame):
 
     def DoDelete(self, objs):
         for obj in objs:
-            self.controller.delete(obj.file_id, obj.file_ext)
+            pass
+            # obj.delete()
         self.myOlv.RemoveObjects(objs)
 
     def DoCopyFileid(self, objs):
@@ -113,20 +113,13 @@ class FlatFileFrame(wx.Frame):
 
 class FlatApp(wx.App):
 
-    def __init__(self, controller):
-        self.controller = controller
-        wx.App.__init__(self)
-
     def OnInit(self):
-        frame = FlatFileFrame(self.controller)
+        frame = FlatFileFrame()
         self.SetTopWindow(frame)
         frame.Show()
         return True
 
 
 if __name__ == '__main__':
-    import storage
-    repo_path = r'/media/document/booklist'
-    controller = storage.build_repo(repo_path)
-    app = FlatApp(controller)
+    app = FlatApp()
     app.MainLoop()

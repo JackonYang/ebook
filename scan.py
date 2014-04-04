@@ -71,4 +71,4 @@ def _add_file(src_path, file_meta):
 
 
 if __name__ == "__main__":
-    print add_path(u'/media/document/booklist/f_media')
+    print add_path(u'/media/document/downloads')
