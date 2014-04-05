@@ -6,10 +6,15 @@
 import os
 import time
 import shutil
-from util import md5_for_file, is_hiden
 
-import model
-from settings import media_path, ignore_seq
+
+if __name__ == "__main__":
+    import sys
+    sys.path.append('../..')  # flatfile package
+
+from flatfile.lib.util import md5_for_file, is_hiden
+import flatfile.model as model
+from flatfile.settings import media_path, ignore_seq
 
 
 class BookScan():
