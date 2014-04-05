@@ -9,7 +9,7 @@ import model
 from util import open_file
 
 
-class FlatFileFrame(wx.Frame):
+class OverViewFrame(wx.Frame):
     def __init__(self):
         FrameStyle = wx.CAPTION | wx.RESIZE_BORDER | wx.SYSTEM_MENU |\
                      wx.MINIMIZE_BOX | wx.MAXIMIZE_BOX | wx.CLOSE_BOX
@@ -111,15 +111,15 @@ class FlatFileFrame(wx.Frame):
         self.OnTextSearchCtrl(event, searchCtrl, olv)
 
 
-class FlatApp(wx.App):
+class TestApp(wx.App):
 
     def OnInit(self):
-        frame = FlatFileFrame()
+        frame = OverViewFrame()
         self.SetTopWindow(frame)
         frame.Show()
         return True
 
 
 if __name__ == '__main__':
-    app = FlatApp()
+    app = TestApp()
     app.MainLoop()
