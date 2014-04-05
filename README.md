@@ -8,14 +8,15 @@ Dev-env
 
 ```
 $ sudo pip install -r requirement.txt
-$ git submodule init  # util module
-$ git submodule update
 ```
 
 Demo
 ----
 
-`$ ./run.sh`
+```
+$ python frame_overview.py
+$ python frame_scan.py
+```
 
 1. auto add `.pdf` file when startup
 2. `F2` to rename file title
@@ -23,8 +24,8 @@ Demo
 4. double click to open corresponding file
 5. searh
 
-
-![deom](doc/home.png)
+![overview](doc/overview.png)
+![scan](doc/scan.png)
 
 More Feature
 ------------
