@@ -47,6 +47,8 @@ class ScanFrame(wx.Frame):
             self.scan = BookScan(dlg.GetPath(), self.text.AppendText)
             # daemonic 为 True 时，表示主线程结束时子线程也要跟着退出
             self.scan.start()
+            self.startBtn.Enable()
+            self.stopBtn.Disable()
 
     def OnStopScan(self, event):
         if self.scan:
