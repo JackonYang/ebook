@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 #coding: utf-8
 import wx
-from book_scan import BookScan
+from lib.book_scan import BookScan
 
 
 class ScanFrame(wx.Frame):

@@ -3,10 +3,10 @@
 
 import wx
 
-from ObjectListView import ObjectListView, ColumnDefn
-from ObjectListView import Filter
 import model
-from util import open_file
+from lib.ObjectListView import ObjectListView, ColumnDefn
+from lib.ObjectListView import Filter
+from lib.util import open_file
 
 
 class OverViewFrame(wx.Frame):
