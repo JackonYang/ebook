@@ -15,6 +15,7 @@ class OverViewFrame(wx.Frame):
                      wx.MINIMIZE_BOX | wx.MAXIMIZE_BOX | wx.CLOSE_BOX
         wx.Frame.__init__(self, parent=None, id=wx.ID_ANY, title="Flat File Explorer", pos=(100, 100), size=(500,600), style=FrameStyle)
         self.Init()
+        self.CenterOnScreen()
 
     def Init(self):
         self.InitModel()
