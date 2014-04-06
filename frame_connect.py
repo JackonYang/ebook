@@ -3,51 +3,59 @@
 import wx
 
 
+def LabelText(label, default_value, parent=None):
+    return (wx.StaticText(parent, label=label),  # Label
+            wx.TextCtrl(parent, size=(150, -1),  # Panel
+                        value=default_value, style=wx.TE_PROCESS_ENTER)
+            )
+
+
 class ConnectDialog(wx.Dialog):
 
     def __init__(self, db, parent=None):
-        self.db = db
         wx.Dialog.__init__(self, parent=parent, id=-1)
+
+        self.db = db  # db handler. connect() method is required
         self.SetTitle("Connect Mongo")
 
-        input_style = wx.TE_PROCESS_ENTER
-        label_host = wx.StaticText(self, label="Host: ")
-        label_port = wx.StaticText(self, label="Port: ")
-        self.input_host = wx.TextCtrl(self, size=(150, -1),
-                                      value='localhost', style=input_style)
-        self.input_port = wx.TextCtrl(self, size=(150, -1),
-                                      value='27017', style=input_style)
+        # widgets
+        labelHost, self.inputHost = LabelText('Host: ', 'localhost', self)
+        labelPort, self.inputPort = LabelText('Port: ', '27017', self)
+        btnConn = wx.Button(self, label='Connect')
+        btnCancel = wx.Button(self, id=wx.ID_CANCEL, label="Cancel")
 
+        # event handler
+        self.Bind(wx.EVT_BUTTON, self.OnConnect, btnConn)
         # connet if user press enter
-        self.input_host.Bind(wx.EVT_TEXT_ENTER, self.OnConnect)
-        self.input_port.Bind(wx.EVT_TEXT_ENTER, self.OnConnect)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnConnect, self.inputHost)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnConnect, self.inputPort)
 
-        self.button_connect = wx.Button(self, label='Connect')
-        self.button_connect.Bind(wx.EVT_BUTTON, self.OnConnect)
+        # default settings
+        self.inputHost.SetFocus()
 
-        self.input_host.SetFocus()
-
+        # Layout-inputs
+        gridInputs = wx.FlexGridSizer(2, 2, 10, 10)
+        gridInputs.SetFlexibleDirection = wx.HORIZONTAL
+        gridInputs.AddMany([(labelHost), (self.inputHost, 0, wx.EXPAND),
+                            (labelPort), (self.inputPort, 0, wx.EXPAND),
+                            ])
+        # Layout-action button
+        sizer_action = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_action.Add(btnConn, 1, flag=wx.ALIGN_CENTER | wx.FIXED_MINSIZE, border=10)
+        sizer_action.Add(btnCancel, 1, flag=wx.ALIGN_CENTER | wx.FIXED_MINSIZE, border=10)
+        # main sizer
         sizer_main = wx.BoxSizer(wx.VERTICAL)
-        flexgrid_inputs = wx.FlexGridSizer(3, 2, 10, 10)
-        flexgrid_inputs.SetFlexibleDirection = wx.HORIZONTAL
-        flexgrid_inputs.AddMany([(label_host),
-                                 (self.input_host, 0, wx.EXPAND),
-                                 (label_port),
-                                 (self.input_port, 0, wx.EXPAND),
-                                 (wx.StaticText(self)),  # 样式占位
-                                 (self.button_connect)
-                                 ])
-        sizer_main.Add(flexgrid_inputs, 1, flag=wx.ALL | wx.EXPAND, border=10)
+        sizer_main.Add(gridInputs, 2, flag=wx.ALL | wx.EXPAND, border=10)
+        sizer_main.Add(sizer_action, 1, flag=wx.ALIGN_CENTER | wx.FIXED_MINSIZE, border=10)
         self.SetSizer(sizer_main)
-
         self.SetAutoLayout(1)
         sizer_main.Fit(self)
 
     def OnConnect(self, event=None):
-        host = self.input_host.GetValue()
-        port = int(self.input_port.GetValue())
+        host = self.inputHost.GetValue()
+        port = int(self.inputPort.GetValue())
         if db.connect(host, port):
-            self.EndModal(1)
+            self.EndModal(wx.ID_OK)
         else:
             msg_error = 'Error connecting to host(%s)' % host
             wx.MessageBox(msg_error, 'Error', wx.OK | wx.ICON_ERROR)
